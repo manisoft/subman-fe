@@ -1,0 +1,97 @@
+.shadow-sm {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  border-radius: 0.5rem;
+}
+
+.fluent-card {
+  border-radius: 0.5rem;
+  background: var(--fluent-colorNeutralBackground1, #fff);
+  padding: 1.5rem;
+}
+
+.fluent-reveal-effect {
+  transition: box-shadow 0.2s, transform 0.2s;
+  border-radius: 0.5rem;
+}
+.fluent-reveal-effect:hover, .fluent-reveal-effect:focus {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.10);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.profile-bg {
+  background: var(--fluent-colorNeutralBackground1);
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 700px;
+  margin: 20px auto 0 auto;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  background: var(--fluent-colorNeutralBackground1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s, background 0.3s;
+}
+
+.profile-card:hover, .profile-card:focus {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.10);
+  transform: translateY(-.5px);
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  background: rgba(59, 130, 246, 0.08);
+  box-shadow: var(--fluent-shadow8);
+}
+
+.profile-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--fluent-colorNeutralForeground1);
+  margin-bottom: 0.25rem;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.profile-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profile-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+@media (max-width: 500px) {
+  .profile-card {
+    min-width: 0;
+    width: 100%;
+    border-radius: 0.5rem;
+    padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+  }
+  .profile-avatar {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1.2rem;
+    border-radius: 0.5rem;
+  }
+}

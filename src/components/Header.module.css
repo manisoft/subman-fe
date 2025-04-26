@@ -1,0 +1,25 @@
+.headerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  height: 64px;
+  background: var(--fluent-colorNeutralBackground1);
+  border-bottom: 1px solid var(--fluent-colorNeutralStroke1);
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.logoBrand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+}
+
+.logoImage {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}

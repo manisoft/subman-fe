@@ -1,0 +1,61 @@
+.settingsBg {
+  background: var(--fluent-colorNeutralBackground1);
+  min-height: 100vh;
+}
+
+.settingsContainer {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 48px 24px 24px 24px;
+}
+
+.settingsCard {
+  border-radius: 0.5rem;
+  background: var(--fluent-colorNeutralBackground1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  margin-bottom: 32px;
+  transition: box-shadow 0.2s, transform 0.3s;
+}
+
+.settingsCard:hover, .settingsCard:focus {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.10);
+  transform: translateY(-.5px);
+}
+
+.settingsSectionHeader {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.settingsSectionDesc {
+  font-size: 0.95rem;
+  color: var(--fluent-colorNeutralForeground3, #888);
+  margin-bottom: 16px;
+}
+
+.settingsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.settingsRowLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.settingsInfoLabel {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.settingsInfoText {
+  font-size: 0.95rem;
+  color: var(--fluent-colorNeutralForeground3, #888);
+}

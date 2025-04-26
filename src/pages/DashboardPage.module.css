@@ -1,0 +1,128 @@
+.pageRoot {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.pageMain {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboardRoot {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboardContainer {
+  width: 1400px;
+  margin: 0 auto;
+  padding: var(--fluent-spacingHorizontalXXL, 16px);
+  flex: 1 0 auto;
+}
+
+.sectionGrid {
+  display: grid;
+  gap: var(--fluent-spacingHorizontalXXL, 16px);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: var(--fluent-spacingVerticalXXL, 40px);
+}
+
+.cardGrid {
+  display: grid;
+  gap: var(--fluent-spacingHorizontalM, 16px);
+  grid-template-columns: 1fr 1fr;
+  overflow: visible;
+}
+
+@media (max-width: 900px) {
+  .cardGrid {
+    grid-template-columns: 1fr;
+    overflow: visible;
+  }
+}
+
+.shadow-sm {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  border-radius: 0.5rem;
+}
+
+.fluent-card {
+  border-radius: 0.5rem;
+  background: var(--fluent-colorNeutralBackground1, #fff);
+  padding: 1.5rem;
+}
+
+.fluent-reveal-effect {
+  transition: box-shadow 0.2s, transform 0.2s;
+  border-radius: 0.5rem;
+}
+
+.fluent-reveal-effect:hover, .fluent-reveal-effect:focus {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.10);
+  transform: translateY(-2px) scale(1.01);
+}
+
+.fluentCard {
+  padding: 1.5rem !important;
+  border-radius: 0.5rem !important;
+  overflow: visible;
+}
+
+.fui-Overlay {
+  backdrop-filter: blur(6px) !important;
+  background: rgba(0,0,0,0.08) !important;
+}
+
+.logo-avatar-bg {
+  background: var(--logo-avatar-bg, #fff) !important;
+}
+
+:root {
+  --logo-avatar-bg: #fff;
+}
+
+[data-theme="dark"], body.dark, .dark {
+  --logo-avatar-bg: #23272f;
+}
+
+
+.cardIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 0.5rem;
+  background: var(--fluent-colorNeutralBackground3, #e5e5e5);
+  margin-right: var(--fluent-spacingHorizontalS, 8px);
+}
+
+.categoryDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 0.5rem;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--fluent-colorNeutralBackground3, #e5e5e5) 25%, var(--fluent-colorNeutralBackground1, #f3f3f3) 50%, var(--fluent-colorNeutralBackground3, #e5e5e5) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.2s infinite linear;
+}
+
+.cardHeader{
+  margin-bottom: 1.2rem;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

@@ -1,0 +1,84 @@
+.addedit-bg {
+  background: var(--fluent-colorNeutralBackground1);
+  min-height: 100vh;
+}
+
+.addedit-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 48px 32px 24px 32px;
+  min-height: 80vh;
+}
+
+.addedit-card {
+  border-radius: 0.5rem;
+  background: var(--fluent-colorNeutralBackground1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s, transform 0.3s;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.addedit-card:hover, .addedit-card:focus {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.10);
+  transform: translateY(-.5px);
+}
+
+.addedit-form {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  flex-grow: 1;
+}
+
+.addedit-form-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.addedit-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  width: 100%;
+  padding-top: 2rem;
+  margin-top: auto;
+  background: var(--fluent-colorNeutralBackground1);
+}
+
+@media (max-width: 900px) {
+  .addedit-form {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+/* Fixed footer for Add/Edit Subscription Page */
+.addedit-footer-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  background: var(--fluent-colorNeutralBackground1);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+}
+
+/* Theme-aware native date picker icon */
+.themed-date-input::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+[data-theme="dark"] .themed-date-input::-webkit-calendar-picker-indicator,
+body.dark .themed-date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.4) contrast(0.9);
+}
+
+.themed-date-input[type="date"] {
+  color-scheme: light dark;
+}
