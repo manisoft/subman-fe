@@ -129,7 +129,7 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
             marginBottom: tokens.spacingVerticalXL
           }}>
             {pagedSubs.map(sub => (
-                          <motion.div
+                          <motion.div key={sub.id}
                           whileHover={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
                           whileFocus={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
                           transition={{ type: 'spring', stiffness: 240, damping: 22, mass: 0.9 }}
