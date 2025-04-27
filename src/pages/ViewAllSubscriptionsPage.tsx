@@ -13,20 +13,22 @@ import { motion } from 'framer-motion';
 // Helper function to format date strings
 const formatFriendlyDate = (dateString: string | null | undefined): string => {
   if (!dateString) return '';
+  // Option 2: Always use the date part (YYYY-MM-DD) and display as local date, avoiding timezone shift.
   try {
-    const date = new Date(dateString);
-    // Check if date is valid before formatting
-    if (isNaN(date.getTime())) {
-      return 'Invalid Date'; 
-    }
-    return date.toLocaleDateString(undefined, { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    // If dateString contains 'T', extract only the date part
+    const datePart = dateString.includes('T') ? dateString.split('T')[0] : dateString;
+    const [yyyy, mm, dd] = datePart.split('-');
+    if (!yyyy || !mm || !dd) return 'Invalid Date';
+    // Format as e.g. Apr 27, 2025
+    const date = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+    return date.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   } catch (e) {
     console.error("Error formatting date:", dateString, e);
-    return 'Invalid Date'; // Return indication of error
+    return 'Invalid Date';
   }
 };
 

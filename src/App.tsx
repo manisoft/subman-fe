@@ -12,6 +12,7 @@ import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import AboutUsPage from './pages/AboutUsPage';
 import ContactUsPage from './pages/ContactUsPage';
 import { subscribeUserToPush, unsubscribeUserFromPush } from './pushNotifications';
+import GoogleAnalytics from './GoogleAnalytics';
 
 const useStyles = makeStyles({
   root: {
@@ -96,6 +97,7 @@ function App({ colorMode, setColorMode }: AppProps) {
   return (
     <div className={classes.root}>
       <Router>
+        <GoogleAnalytics />
         <Routes>
           {/* Unauthenticated routes */}
           <Route path="/terms-of-service" element={<TermsOfServicePage user={user} />} />

@@ -1,7 +1,7 @@
+import { useVersion } from '../hooks/useVersion';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { makeStyles, shorthands } from '@fluentui/react-components';
-
 import { tokens } from '@fluentui/react-components';
 
 const useStyles = makeStyles({
@@ -53,16 +53,24 @@ const useStyles = makeStyles({
   },
 });
 
+
+
 export default function Footer() {
   const styles = useStyles();
+  const { version, loading, error } = useVersion();
   return (
     <footer className={styles.footer}>
       <div className={styles.footerInner}>
-        <p className={styles.copyright}>© {new Date().getFullYear()} SubMan. All rights reserved.</p>
+        <p className={styles.copyright}>
+          © {new Date().getFullYear()} SubMan. All rights reserved.
+          {loading ? null : error ? null : version && (
+            <span style={{ marginLeft: 12, color: '#888' }}>Version: {version}</span>
+          )}
+        </p>
         <div className={styles.links}>
           <Link className={styles.link} to="/about-us">About Us</Link>
           <Link className={styles.link} to="/contact-us">Contact Us</Link>
-          <Link className={styles.link} to="/terms-of-service">Terms of Service</Link>
+          <Link className={styles.link} to="/terms-of-service">Terms & Conditions</Link>
           <Link className={styles.link} to="/privacy-policy">Privacy Policy</Link>
         </div>
       </div>
