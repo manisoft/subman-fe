@@ -25,6 +25,19 @@ const BILLING_CYCLES = [
   { key: 'quarterly', text: 'Quarterly' },
   { key: 'yearly', text: 'Yearly' },
 ];
+
+const CATEGORIES = [
+  { key: 'entertainment', text: 'Entertainment' },
+  { key: 'shopping', text: 'Shopping' },
+  { key: 'education', text: 'Education' },
+  { key: 'finance', text: 'Finance' },
+  { key: 'music', text: 'Music' },
+  { key: 'utilities', text: 'Utilities' },
+  { key: 'streaming', text: 'Streaming' },
+  { key: 'software', text: 'Software' },
+  { key: 'other', text: 'Other' }
+];
+
 export default function AddEditSubscriptionPage({ token, user }: AddEditSubscriptionPageProps) {
   return (
     <div className={styles["addedit-bg"]}>
@@ -60,9 +73,9 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
   const [popularError, setPopularError] = useState('');
   const [name, setName] = useState(state?.name || '');
   const [price, setPrice] = useState('');
-  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [billingCycle, setBillingCycle] = useState('Monthly');
   const [category, setCategory] = useState(state?.category || 'Other');
-  const [categories, setCategories] = useState<string[]>(['Entertainment', 'Productivity', 'Education', 'Finance','Other']);
+  const [categories, setCategories] = useState<{ key: string; text: string }[]>(CATEGORIES);
   const [nextBillingDate, setNextBillingDate] = useState('');
   const [description, setDescription] = useState('');
   const [logo, setLogo] = useState(state?.logo || '');
@@ -125,8 +138,8 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
           };
           setName(sub.name || '');
           setPrice(sub.price ? String(sub.price) : '');
-          setBillingCycle(sub.billing_cycle || 'monthly');
-          setCategory(sub.category || '');
+          setBillingCycle(sub.billing_cycle || 'Monthly');
+          setCategory(sub.category || 'Other');
           // Ensure nextBillingDate is in 'YYYY-MM-DD' format for input[type=date]
           let dateValue = '';
           if (sub.next_billing_date) {
@@ -271,7 +284,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                           }}
                         >
                           {BILLING_CYCLES.map(c => (
-                            <Option key={c.key} value={c.key}>{c.text}</Option>
+                            <Option key={c.key} value={c.text}>{c.text}</Option>
                           ))}
                         </Dropdown>
                         <Label htmlFor="sub-date">Next Billing Date</Label>
@@ -287,17 +300,17 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                         <Dropdown
                           id="sub-category"
                           value={category}
+                          placeholder="Select category"
                           onOptionSelect={(_event: unknown, data: DropdownOnChangeData) => {
-                            const newValue = data.optionValue || 'Other';
-                            setCategory(newValue);
+                            if (data.optionValue) {
+                              setCategory(data.optionValue);
+                            }
                           }}
                         >
-                          <Option value="Other">Other</Option>
-                          {categories.filter(cat => cat !== 'Other').map((cat: string) => (
-                            <Option key={cat} value={cat}>{cat}</Option>
+                        {CATEGORIES.map(c => (
+                            <Option key={c.key} value={c.text}>{c.text}</Option>
                           ))}
                         </Dropdown>
-                        
                       </div>
                       <div className={styles["addedit-form-col"]}>
                         <Label htmlFor="sub-description">Description</Label>
