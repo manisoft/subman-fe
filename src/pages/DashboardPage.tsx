@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { parseISO, isAfter, isBefore, addDays, format, isValid, compareAsc, startOfDay, parse, isEqual } from 'date-fns';
 import { motion } from 'framer-motion';
 import { tokens } from '@fluentui/react-components';
 import { 
@@ -54,23 +55,24 @@ const getTextColorForBackground = (bgColor: string): string => {
   }
 };
 
-// Helper function to format date strings
+// Helper: Parse 'YYYY-MM-DD' as local date (not UTC)
+const parseLocalDate = (dateString: string) => {
+  if (!dateString) return new Date(''); // Invalid date
+  // If dateString contains 'T', extract only the date part
+  const datePart = dateString.includes('T') ? dateString.split('T')[0] : dateString;
+  return parse(datePart, 'yyyy-MM-dd', new Date());
+};
+
+// Helper function to format date strings user-friendly and correctly
 const formatFriendlyDate = (dateString: string | null | undefined): string => {
   if (!dateString) return '';
   try {
-    const date = new Date(dateString);
-    // Check if date is valid before formatting
-    if (isNaN(date.getTime())) {
-      return 'Invalid Date'; 
-    }
-    return date.toLocaleDateString(undefined, { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
-    });
+    const date = parseLocalDate(dateString);
+    if (!isValid(date)) return 'Invalid Date';
+    return format(date, 'MMM d, yyyy'); // e.g., May 23, 2025
   } catch (e) {
     console.error("Error formatting date:", dateString, e);
-    return 'Invalid Date'; // Return indication of error
+    return 'Invalid Date';
   }
 };
 
@@ -246,31 +248,49 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                 </div>
                 <div style={{ padding: tokens.spacingVerticalXL, textAlign: 'center' }}>
                   {loading ? (
-                    <div className={styles.skeleton} style={{ height: 96, borderRadius: 12, margin: '0 auto' }} />
-                  ) : (
-                    subs.length === 0 ? (
-                      <>
-                      <div><CalendarLtr24Regular style={{ width: 48, height: 48, color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }} /></div>
-                        <div><Text weight="semibold" size={400} style={{ marginBottom: 16 }}>No subscriptions yet</Text></div>
-                        <div><Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }}>You have not added any subscriptions to your account.</Text></div>
-                        <div><Button appearance="primary" style={{ marginTop: 20 }} onClick={handleAdd}>Add your first subscription</Button></div>
-                      </>
-                    ) : subs.filter(s => s.next_billing_date && new Date(s.next_billing_date) > new Date()).length === 0 ? (
-                      <>
-                        <div><CalendarLtr24Regular style={{ width: 48, height: 48, color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }} /></div>
-                        <div><Text weight="semibold" size={400}>No upcoming payments</Text></div>
-                        <div><Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: '8px 0' }}>You don't have any payments due in the next 30 days</Text></div>
-                      </>
-                    ) : (
-                      // List upcoming payments
-                      subs.filter(s => s.next_billing_date && new Date(s.next_billing_date) > new Date()).map(s => (
-                        <div key={s.id} style={{ marginBottom: tokens.spacingVerticalXS }}>
-                          <Text weight="semibold">{s.name}</Text>
-                          <Text size={300} style={{ marginLeft: tokens.spacingHorizontalS }}>{formatFriendlyDate(s.next_billing_date)}</Text>
-                        </div>
-                      ))
-                    )
-                  )}
+  <div className={styles.skeleton} style={{ height: 96, borderRadius: 12, margin: '0 auto' }} />
+) : (
+  subs.length === 0 ? (
+    <>
+      <div><CalendarLtr24Regular style={{ width: 48, height: 48, color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }} /></div>
+      <div><Text weight="semibold" size={400} style={{ marginBottom: 16 }}>No subscriptions yet</Text></div>
+      <div><Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }}>You have not added any subscriptions to your account.</Text></div>
+      <div><Button appearance="primary" style={{ marginTop: 20 }} onClick={handleAdd}>Add your first subscription</Button></div>
+    </>
+  ) : (() => {
+    // Use date-fns for robust, timezone-safe filtering and sorting
+    const today = startOfDay(new Date());
+    const in30Days = addDays(today, 30);
+    const isSameOrAfter = (dateA: Date, dateB: Date) => isAfter(dateA, dateB) || isEqual(dateA, dateB);
+    const isSameOrBefore = (dateA: Date, dateB: Date) => isBefore(dateA, dateB) || isEqual(dateA, dateB);
+    const upcoming = subs
+      .filter(s => {
+        if (!s.next_billing_date) return false;
+        const d = parseLocalDate(s.next_billing_date);
+        return isValid(d) && isSameOrAfter(d, today) && isSameOrBefore(d, in30Days);
+      })
+      .sort((a, b) => {
+        const da = parseLocalDate(a.next_billing_date || '');
+        const db = parseLocalDate(b.next_billing_date || '');
+        return compareAsc(da, db);
+      });
+    if (upcoming.length === 0) {
+      return (
+        <>
+          <div><CalendarLtr24Regular style={{ width: 48, height: 48, color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }} /></div>
+          <div><Text weight="semibold" size={400}>No upcoming payments</Text></div>
+          <div><Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: '8px 0' }}>You don't have any payments due in the next 30 days</Text></div>
+        </>
+      );
+    }
+    return upcoming.map(s => (
+      <div key={s.id} style={{ marginBottom: tokens.spacingVerticalXS }}>
+        <Text weight="semibold">{s.name}</Text>
+        <Text size={300} style={{ marginLeft: tokens.spacingHorizontalS }}>{formatFriendlyDate(s.next_billing_date)}</Text>
+      </div>
+    ));
+  })()
+)}
                 </div>
                 {subs.length > 0 && (
   <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0 0 0' }}>

@@ -34,6 +34,7 @@ const CATEGORIES = [
   { key: 'utilities', text: 'Utilities' },
   { key: 'streaming', text: 'Streaming' },
   { key: 'software', text: 'Software' },
+  { key: 'insurance', text: 'Insurance' },
   { key: 'other', text: 'Other' }
 ];
 
