@@ -29,11 +29,15 @@ const useStyles = makeStyles({
       justifyContent: 'space-between',
       alignItems: 'center',
     },
+    '@media (max-width: 600px)': {
+      padding: '16px 0',
+    },
   },
   copyright: {
     color: '#888',
     fontSize: '14px',
     marginBottom: '16px',
+    textAlign: 'center',
     '@media (min-width: 768px)': {
       marginBottom: 0,
     },
@@ -41,6 +45,13 @@ const useStyles = makeStyles({
   links: {
     display: 'flex',
     gap: '24px',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    '@media (max-width: 600px)': {
+      flexDirection: 'column',
+      gap: '10px',
+      alignItems: 'center',
+    },
   },
   link: {
     color: '#888',
@@ -49,6 +60,9 @@ const useStyles = makeStyles({
     transition: 'color 0.2s',
     ':hover': {
       color: '#323130',
+    },
+    '@media (max-width: 600px)': {
+      fontSize: '13px',
     },
   },
 });

@@ -9,7 +9,23 @@
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
 }
+
+@media (max-width: 600px) {
+  .headerContainer {
+    padding: 0 10px;
+    height: 54px;
+  }
+  .logoBrand {
+    gap: 8px;
+  }
+  .logoImage {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 
 .logoBrand {
   display: flex;

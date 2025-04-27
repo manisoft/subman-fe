@@ -17,11 +17,50 @@
 }
 
 .dashboardContainer {
-  width: 1400px;
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
   padding: var(--fluent-spacingHorizontalXXL, 16px);
   flex: 1 0 auto;
+  box-sizing: border-box;
 }
+
+@media (max-width: 900px) {
+  .dashboardContainer {
+    padding: 12px 4vw 12px 4vw;
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  .sectionGrid {
+    gap: 12px;
+    grid-template-columns: 1fr;
+  }
+  .cardGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .fluentCard {
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboardContainer {
+    padding: 6px 2vw 6px 2vw;
+  }
+  .fluentCard {
+    padding: 0.7rem !important;
+    font-size: 0.95rem;
+  }
+  .sectionGrid {
+    gap: 8px;
+  }
+  .cardGrid {
+    gap: 8px;
+  }
+}
+
 
 .sectionGrid {
   display: grid;
