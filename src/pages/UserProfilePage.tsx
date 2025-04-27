@@ -67,7 +67,9 @@ export default function UserProfilePage({ user, token, onLogout }: { user: any; 
     <>
       <Header user={{ ...user, avatarUrl }} />
       <div className={styles['profile-bg']}>
-        <div style={{ maxWidth: 700, margin: '0 auto', padding: '48px 24px 24px 24px', width: '100%' }}>
+        <div style={{ width: '100%', maxWidth: 700, margin: '0 auto', padding: '48px 24px 24px 24px', boxSizing: 'border-box' }}>
+
+
           <div className={styles['profile-card']}>
             <Avatar
               name={name || email || 'User'}
