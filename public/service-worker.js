@@ -44,7 +44,8 @@ async function checkAndNotifyPayments() {
   const now = new Date();
   for (const sub of subs) {
     if (!sub.next_billing_date) continue;
-    const payDate = new Date(sub.next_billing_date);
+    const payDate = getCurrentNextBillingDateSW(sub.next_billing_date, sub.billing_cycle, now);
+    if (!payDate) continue;
     const diffDays = Math.floor((payDate - now) / (1000 * 60 * 60 * 24));
     if (diffDays === 1 || diffDays === 0) {
       // Show notification
@@ -85,6 +86,40 @@ function getSubscriptions() {
       resolve([]);
     };
   });
+}
+
+// Helper: Advance next_billing_date to today or future based on billing_cycle (service worker version)
+function getCurrentNextBillingDateSW(rawDate, billingCycle, today = new Date()) {
+  if (!rawDate) return null;
+  let date = new Date(rawDate);
+  if (isNaN(date.getTime())) return null;
+  // Normalize to start of day (local)
+  date.setHours(0,0,0,0);
+  const startOfToday = new Date(today);
+  startOfToday.setHours(0,0,0,0);
+  while (date < startOfToday) {
+    switch ((billingCycle || '').toLowerCase().replace(/[-\s]/g, '')) {
+      case 'monthly':
+        date.setMonth(date.getMonth() + 1);
+        break;
+      case 'yearly':
+        date.setFullYear(date.getFullYear() + 1);
+        break;
+      case 'weekly':
+        date.setDate(date.getDate() + 7);
+        break;
+      case 'biweekly':
+        date.setDate(date.getDate() + 14);
+        break;
+      case 'quarterly':
+        date.setMonth(date.getMonth() + 3);
+        break;
+      default:
+        // If unknown, do not advance
+        return date;
+    }
+  }
+  return date;
 }
 
 // Notification click handler

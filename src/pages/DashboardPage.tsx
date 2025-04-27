@@ -18,6 +18,7 @@ import { Dismiss24Regular, CalendarLtr24Regular, Wallet24Regular, Cart24Regular,
 import { getSubscriptions, apiRequest } from '../api';
 import { subscribeUserToPush, unsubscribeUserFromPush } from '../pushNotifications';
 import { useNavigate } from 'react-router-dom';
+import { addMonths, addYears, addWeeks } from 'date-fns';
 
 // Define Subscription interface
 interface Subscription {
@@ -62,6 +63,37 @@ const parseLocalDate = (dateString: string) => {
   const datePart = dateString.includes('T') ? dateString.split('T')[0] : dateString;
   return parse(datePart, 'yyyy-MM-dd', new Date());
 };
+
+// Helper: Advance next_billing_date to today or future based on billing_cycle
+function getCurrentNextBillingDate(rawDate: string | null | undefined, billingCycle: string, today: Date = new Date()): Date | null {
+  if (!rawDate) return null;
+  let date = parseLocalDate(rawDate);
+  if (!isValid(date)) return null;
+  while (isBefore(date, startOfDay(today))) {
+    switch ((billingCycle || '').toLowerCase().replace(/[-\s]/g, '')) {
+      case 'monthly':
+        date = addMonths(date, 1);
+        break;
+      case 'yearly':
+        date = addYears(date, 1);
+        break;
+      case 'weekly':
+        date = addWeeks(date, 1);
+        break;
+      case 'biweekly':
+        date = addWeeks(date, 2);
+        break;
+      case 'quarterly':
+        date = addMonths(date, 3);
+        break;
+      default:
+        // If unknown, do not advance
+        return date;
+    }
+  }
+  return date;
+}
+
 
 // Helper function to format date strings user-friendly and correctly
 const formatFriendlyDate = (dateString: string | null | undefined): string => {
@@ -179,14 +211,28 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                 {
                   icon: <CalendarLtr24Regular className={styles.cardIcon} />, label: 'Next Payment',
                   value: (() => {
-                    if (!subs.length) return 'No upcoming';
-                    const nextSub = subs.reduce((next: Subscription | null, s: Subscription) => {
-                      if (!s.next_billing_date) return next;
-                      if (!next || !next.next_billing_date || new Date(s.next_billing_date) < new Date(next.next_billing_date)) return s;
-                      return next;
-                    }, null);
-                    return nextSub && nextSub.next_billing_date ? formatFriendlyDate(nextSub.next_billing_date) : 'No upcoming';
-                  })(),
+                  if (!subs.length) return 'No upcoming';
+                  const today = startOfDay(new Date());
+                  // Filter to only those today or after
+                  const upcoming = subs.filter(s => {
+                    if (!s.next_billing_date) return false;
+                    const d = getCurrentNextBillingDate(s.next_billing_date, s.billing_cycle, today);
+                    return d !== null && isValid(d) && !isBefore(d, today);
+                  });
+                  if (!upcoming.length) return 'No upcoming';
+                  // Find the soonest
+                  const nextSub = upcoming.reduce((next: Subscription | null, s: Subscription) => {
+                  if (!next || !next.next_billing_date) return s;
+                  if (!s.next_billing_date || !next.next_billing_date) return next;
+                  const d = getCurrentNextBillingDate(s.next_billing_date, s.billing_cycle, today);
+                  const dn = getCurrentNextBillingDate(next.next_billing_date, next.billing_cycle, today);
+                  if (d === null || dn === null) return next;
+                  return isBefore(d, dn) ? s : next;
+                }, null);
+                  return nextSub && nextSub.next_billing_date
+    ? formatFriendlyDate(getCurrentNextBillingDate(nextSub.next_billing_date, nextSub.billing_cycle, today)?.toISOString().slice(0, 10) || null)
+    : 'No upcoming';
+                })(),
                   sub: (() => {
                     if (!subs.length) return 'No payments due soon';
                     const nextSub = subs.reduce((next: Subscription | null, s: Subscription) => {
@@ -264,16 +310,16 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
     const isSameOrAfter = (dateA: Date, dateB: Date) => isAfter(dateA, dateB) || isEqual(dateA, dateB);
     const isSameOrBefore = (dateA: Date, dateB: Date) => isBefore(dateA, dateB) || isEqual(dateA, dateB);
     const upcoming = subs
-      .filter(s => {
-        if (!s.next_billing_date) return false;
-        const d = parseLocalDate(s.next_billing_date);
-        return isValid(d) && isSameOrAfter(d, today) && isSameOrBefore(d, in30Days);
+      .map(s => {
+        if (!s.next_billing_date) return null;
+        const d = getCurrentNextBillingDate(s.next_billing_date, s.billing_cycle, today);
+        if (d && isValid(d) && isSameOrAfter(d, today) && isSameOrBefore(d, in30Days)) {
+          return { ...s, _computedNextBillingDate: d };
+        }
+        return null;
       })
-      .sort((a, b) => {
-        const da = parseLocalDate(a.next_billing_date || '');
-        const db = parseLocalDate(b.next_billing_date || '');
-        return compareAsc(da, db);
-      });
+      .filter((s): s is Subscription & { _computedNextBillingDate: Date } => s !== null)
+      .sort((a, b) => compareAsc(a._computedNextBillingDate, b._computedNextBillingDate));
     if (upcoming.length === 0) {
       return (
         <>
@@ -286,7 +332,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
     return upcoming.map(s => (
       <div key={s.id} style={{ marginBottom: tokens.spacingVerticalXS }}>
         <Text weight="semibold">{s.name}</Text>
-        <Text size={300} style={{ marginLeft: tokens.spacingHorizontalS }}>{formatFriendlyDate(s.next_billing_date)}</Text>
+        <Text size={300} style={{ marginLeft: tokens.spacingHorizontalS }}>{formatFriendlyDate(s._computedNextBillingDate.toISOString().slice(0, 10))}</Text>
       </div>
     ));
   })()
