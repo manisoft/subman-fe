@@ -40,27 +40,55 @@ export default function AddEditSubscriptionPage({ token, user }: AddEditSubscrip
 }
 
 function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPageProps): React.ReactElement {
+  const location = useLocation();
   const params = useParams<{ id?: string }>();
   const id = params.id;
   const isEdit = !!id;
   const navigate = useNavigate();
-  const [tab, setTab] = useState<'popular' | 'custom'>(isEdit ? 'custom' : 'popular');
+  // Prefill from location.state (PopularServiceCard)
+  const state = location.state as {
+    name?: string;
+    logo?: string;
+    color?: string;
+    category?: string;
+  } | undefined;
+  const [tab, setTab] = useState<'popular' | 'custom'>(
+    isEdit ? 'custom' : (state?.name || state?.logo || state?.color || state?.category ? 'custom' : 'popular')
+  );
   const [popularServices, setPopularServices] = useState<any[]>([]);
   const [loadingPopular, setLoadingPopular] = useState(false);
   const [popularError, setPopularError] = useState('');
-  const [name, setName] = useState('');
+  const [name, setName] = useState(state?.name || '');
   const [price, setPrice] = useState('');
   const [billingCycle, setBillingCycle] = useState('monthly');
-  const [category, setCategory] = useState('');
-  const [categories, setCategories] = useState<string[]>(['Entertainment', 'Productivity', 'Education', 'Finance', 'Other']);
+  const [category, setCategory] = useState(state?.category || 'Other');
+  const [categories, setCategories] = useState<string[]>(['Entertainment', 'Productivity', 'Education', 'Finance','Other']);
   const [nextBillingDate, setNextBillingDate] = useState('');
   const [description, setDescription] = useState('');
-  const [logo, setLogo] = useState('');
+  const [logo, setLogo] = useState(state?.logo || '');
   const [website, setWebsite] = useState('');
   const [notes, setNotes] = useState('');
-  const [color, setColor] = useState('#e5e7eb');
+  const [color, setColor] = useState(state?.color || '#e5e7eb');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Auto-switch to 'custom' tab if prefill data is present and not editing
+  useEffect(() => {
+    if (!isEdit && (state?.name || state?.logo || state?.color || state?.category)) {
+      setTab('custom');
+    }
+    // eslint-disable-next-line
+  }, [state, isEdit]);
+
+  // Prefill form fields when state changes (e.g., from Popular Service card)
+  useEffect(() => {
+    if (state) {
+      if (state.name) setName(state.name);
+      if (state.logo) setLogo(state.logo);
+      if (state.color) setColor(state.color);
+      if (state.category) setCategory(state.category);
+    }
+  }, [state]);
 
   // Theme detection: match User Dashboard
   useEffect(() => {
@@ -264,7 +292,8 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                             setCategory(newValue);
                           }}
                         >
-                          {categories.map((cat: string) => (
+                          <Option value="Other">Other</Option>
+                          {categories.filter(cat => cat !== 'Other').map((cat: string) => (
                             <Option key={cat} value={cat}>{cat}</Option>
                           ))}
                         </Dropdown>
