@@ -4,7 +4,7 @@ import { ColorLineRegular, DeleteRegular, DeleteDismissRegular } from '@fluentui
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import styles from './DashboardPage.module.css';
+import styles from './ViewAllSubscriptionsPage.module.css';
 import { getSubscriptions, apiRequest } from '../api';
 import { updateSubscriptionsInServiceWorker } from '../utils/swSubscriptions';
 import { Dialog, DialogTrigger, DialogSurface, DialogBody, DialogTitle, DialogActions } from '@fluentui/react-components';
@@ -124,12 +124,7 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
         {loading ? (
           <Spinner size="large" />
         ) : (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 24,
-            marginBottom: tokens.spacingVerticalXL
-          }}>
+          <div className={styles.subsgrid}>
             {pagedSubs.map(sub => (
                           <motion.div key={sub.id}
                           whileHover={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
