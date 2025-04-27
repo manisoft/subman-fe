@@ -201,14 +201,6 @@
   z-index: 10;
 }
 
-@media (max-width: 900px) {
-  .auth-card {
-    width: 95vw;
-    min-width: 0;
-    padding: 1.2rem 0.5rem 1.5rem 0.5rem;
-  }
-}
-
 
 .auth-logo {
   width: 80px;
@@ -322,37 +314,44 @@
   margin-bottom: 1.2rem;
 }
 
-/* Make the card wider for desktop subscription form */
-.auth-card {
-  width: 650px;
-  max-width: 1400px;
-}
-
-@media (max-width: 900px) {
-  .auth-card {
-    width: 95vw;
-    min-width: 0;
+  .auth-bg {
+    padding-bottom: 4rem;
+    overflow-x: hidden;
   }
-  .auth-form-grid {
-    grid-template-columns: 1fr;
-    gap: 1.2rem 0;
-  }
-  .auth-form-actions {
-    grid-column: 1;
-  }
-}
-
-@media (max-width: 500px) {
   .auth-card {
     min-width: 0;
-    width: 100vw;
+    width: 650px;
+    max-width: 1400px;
     border-radius: 0.5rem;
-    padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+    padding: 1.2rem;
+    font-size: 0.98rem;
+    overflow-x: hidden;
   }
   .auth-logo {
-    width: 60px;
-    height: 60px;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 0.8rem;
+  }
+  .auth-title {
+    font-size: 1.2rem;
+  }
+  .auth-subtitle {
+    font-size: 0.98rem;
     margin-bottom: 1.2rem;
   }
-}
+  .auth-form {
+    gap: 1rem;
+  }
+  .auth-footer-global {
+    font-size: 0.9rem;
+    padding: 0.7rem 0 0.7rem 0;
+  }
+
+  @media only screen and (max-width: 768px)
+  {
+    .auth-card {
+      width: 90vw;
+      padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+    }
+  }
 

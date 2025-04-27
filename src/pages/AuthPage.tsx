@@ -82,7 +82,7 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
             <Input id="auth-password" type="password" value={password} onChange={e => setPassword((e.target as HTMLInputElement).value)} required size="large"/>
             {error && <Text style={{ color: error.startsWith('Registration') ? tokens.colorPaletteGreenForeground1 : tokens.colorPaletteRedForeground1, textAlign: 'center' }}>{error}</Text>}
             <div className={styles['auth-footer']}>
-              <Button appearance="primary" type="submit" disabled={loading} style={{ width: '100%' }} size="large">
+              <Button appearance="primary" type="submit" disabled={loading} style={{ width: '100%', marginTop: 40 }} size="large">
                 {loading ? <Spinner size="tiny" /> : mode === 'login' ? 'Sign In' : 'Sign Up'}
               </Button>
             </div>
