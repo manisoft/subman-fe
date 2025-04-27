@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import styles from './AddEditSubscriptionPage.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Input, Label, Card, CardHeader, CardFooter, Text, Spinner, Dropdown, Option } from '@fluentui/react-components';
-import { ColorRegular, CalendarLtrRegular, SaveRegular, AddFilled } from '@fluentui/react-icons';
+import { Button, Input, Label, Text, Spinner, Dropdown, Option } from '@fluentui/react-components';
+import { ColorRegular, SaveRegular, AddFilled } from '@fluentui/react-icons';
 
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { apiRequest } from '../api';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import QuickAddSubscriptionModal, { QuickAddSubscriptionModalFields } from '../components/QuickAddSubscriptionModal';
 
 
 type DropdownOnChangeData = { optionValue?: string }; // Best practice for Fluent UI v9
@@ -242,7 +241,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                 {tab === 'popular' ? (
                   <>
                     {loadingPopular ? (
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24, minHeight: 160 }}>
+                      <div className={styles.addeditCardPopular}>
                         {Array.from({ length: 4 }).map((_, idx) => (
                           <div key={idx} className={styles.skeleton} style={{ height: 140, borderRadius: 16 }} />
                         ))}
@@ -250,7 +249,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                     ) : popularError ? (
                       <Text style={{ color: 'var(--fluent-colorPaletteRedForeground1, red)' }}>{popularError}</Text>
                     ) : (
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }}>
+                      <div className={styles.addeditCardPopular}>
                         {popularServices.map((service, idx) => (
                           <React.Fragment key={service.id}>
                             {/* Use the new PopularServiceCard component */}
@@ -325,7 +324,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                           <span>Color</span>
                           <ColorRegular style={{ marginLeft: 4, fontSize: 20 }} />
                         </Label>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div className={styles.colorSelector}>
                           <input
                             type="color"
                             id="sub-color"
@@ -337,7 +336,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                       </div>
                       <div className={styles["addedit-form-actions"]}>
                         {error && <Text style={{ color: 'var(--fluent-colorPaletteRedForeground1, red)' }}>{error}</Text>}
-                        <Button style={{ marginRight: 16 }} appearance="subtle" type="button" onClick={() => navigate('/subscriptions')}>Cancel</Button>
+                        <Button className={styles["cancel-btn"]} appearance="subtle" type="button" onClick={() => navigate('/subscriptions')}>Cancel</Button>
                         <Button appearance="primary" type="submit" disabled={loading}>
                           {loading ? <Spinner size="tiny" /> : isEdit ? <><SaveRegular style={{marginRight: 6}} />Save</> : <><AddFilled style={{marginRight: 6}} />Add</>}
                         </Button>
