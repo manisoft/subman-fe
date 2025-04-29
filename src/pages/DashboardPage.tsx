@@ -436,6 +436,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
           </div>
         </div>
       )}
+      {/* Footer now shows version from backend (MySQL) */}
       <Footer />
     </div>
   );

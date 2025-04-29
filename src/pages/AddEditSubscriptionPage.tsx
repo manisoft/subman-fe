@@ -269,9 +269,9 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                     <form className={styles["addedit-form"]} onSubmit={handleSubmit}>
                       <div className={styles["addedit-form-col"]}>
                         <Label htmlFor="sub-name">Name</Label>
-                        <Input id="sub-name" value={name} onChange={e => setName((e.target as HTMLInputElement).value)} required />
+                        <Input id="sub-name" className={styles.labelStyles} value={name} onChange={e => setName((e.target as HTMLInputElement).value)} required />
                         <Label htmlFor="sub-price">Price ($)</Label>
-                        <Input id="sub-price" type="number" value={price} onChange={e => setPrice((e.target as HTMLInputElement).value)} required />
+                        <Input id="sub-price" type="number" className={styles.labelStyles} value={price} onChange={e => setPrice((e.target as HTMLInputElement).value)} required />
                         <Label htmlFor="sub-billing">Billing Cycle</Label>
                         <Dropdown
                           id="sub-billing"
@@ -287,7 +287,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                             <Option key={c.key} value={c.text}>{c.text}</Option>
                           ))}
                         </Dropdown>
-                        <Label htmlFor="sub-date">Next Billing Date</Label>
+                        <Label htmlFor="sub-date" className={styles.catStyle}>Next Billing Date</Label>
                         <Input
                           id="sub-date"
                           type="date"
@@ -296,7 +296,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                           required
                           className={styles["themed-date-input"]}
                         />
-                        <Label htmlFor="sub-category">Category</Label>
+                        <Label htmlFor="sub-category" className={styles.catStyle}>Category</Label>
                         <Dropdown
                           id="sub-category"
                           value={category}
@@ -314,13 +314,13 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                       </div>
                       <div className={styles["addedit-form-col"]}>
                         <Label htmlFor="sub-description">Description</Label>
-                        <Input id="sub-description" value={description} onChange={e => setDescription((e.target as HTMLInputElement).value)} />
+                        <Input id="sub-description" className={styles.labelStyles} value={description} onChange={e => setDescription((e.target as HTMLInputElement).value)} />
                         <Label htmlFor="sub-logo">Logo URL</Label>
-                        <Input id="sub-logo" value={logo} onChange={e => setLogo((e.target as HTMLInputElement).value)} />
+                        <Input id="sub-logo" className={styles.labelStyles} value={logo} onChange={e => setLogo((e.target as HTMLInputElement).value)} />
                         <Label htmlFor="sub-website">Website</Label>
-                        <Input id="sub-website" value={website} onChange={e => setWebsite((e.target as HTMLInputElement).value)} />
+                        <Input id="sub-website" className={styles.labelStyles} value={website} onChange={e => setWebsite((e.target as HTMLInputElement).value)} />
                         <Label htmlFor="sub-notes">Notes</Label>
-                        <Input id="sub-notes" value={notes} onChange={e => setNotes((e.target as HTMLInputElement).value)} />
+                        <Input id="sub-notes" className={styles.labelStyles} value={notes} onChange={e => setNotes((e.target as HTMLInputElement).value)} />
                         <Label htmlFor="sub-color" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                           <span>Color</span>
                           <ColorRegular style={{ marginLeft: 4, fontSize: 20 }} />

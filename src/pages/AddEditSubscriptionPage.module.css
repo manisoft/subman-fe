@@ -226,8 +226,8 @@
   padding-bottom: 0.5rem;
 }
 
-Label {
-  margin-top: 1.6rem;
+.labelStyles {
+  margin-bottom: 1.6rem;
 }
 
 /* Fixed footer for Add/Edit Subscription Page */
@@ -249,3 +249,8 @@ Label {
 .themed-date-input[type="date"] {
   color-scheme: light dark;
 }
+
+.catStyle {
+  margin-top: 1.6rem;
+}
+

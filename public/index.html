@@ -27,7 +27,20 @@
     <meta name="apple-mobile-web-app-configuration" content="standalone">
     <meta name="apple-mobile-web-app-version" content="1.0">
     <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <style>
+      html, body {
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        touch-action: manipulation;
+      }
+      input, textarea, select {
+        -webkit-user-select: auto !important;
+        -ms-user-select: auto !important;
+        user-select: auto !important;
+      }
+    </style>
     <meta name="theme-color" content="#ffffff" />
     <link rel="apple-touch-icon" href="/logo192.png" />
     <!--

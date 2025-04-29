@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import { Card, CardHeader, CardFooter, Text, Button, Switch, Dropdown, Option, Spinner, Label } from '@fluentui/react-components';
 import { WeatherSunnyRegular, WeatherMoonRegular, AlertRegular } from '@fluentui/react-icons';
 import styles from './SettingsPage.module.css';
+import { useVersion } from '../hooks/useVersion';
 
 interface SettingsPageProps {
   colorMode: 'light' | 'dark';
@@ -18,15 +19,14 @@ export default function SettingsPage({ colorMode, setColorMode, pushEnabled, pus
   // Check browser notification permission
   const [permission, setPermission] = React.useState(Notification.permission);
   const prevPermission = React.useRef(permission);
+  const { version, loading, error, releaseDate } = useVersion();
 
   React.useEffect(() => {
     setPermission(Notification.permission);
   }, [pushEnabled]);
 
+  // Removed: auto-refresh is now handled in App.tsx
   React.useEffect(() => {
-    if (prevPermission.current !== 'granted' && permission === 'granted') {
-      window.location.reload();
-    }
     prevPermission.current = permission;
   }, [permission]);
 
@@ -101,7 +101,7 @@ export default function SettingsPage({ colorMode, setColorMode, pushEnabled, pus
               <div style={{ padding: 24, paddingTop: 0 }}>
                 <div style={{ marginBottom: 20 }}>
                   <div className={styles.settingsInfoLabel}>Version</div>
-                  <div className={styles.settingsInfoText}>1.4.0</div>
+                  <div className={styles.settingsInfoText}>{version || (loading ? 'Loading...' : error ? 'Error' : '')}</div>
                 </div>
                 <div style={{ marginBottom: 20 }}>
                   <div className={styles.settingsInfoLabel}>Installation Type</div>
@@ -109,7 +109,7 @@ export default function SettingsPage({ colorMode, setColorMode, pushEnabled, pus
                 </div>
                 <div>
                   <div className={styles.settingsInfoLabel}>Last Updated</div>
-                  <div className={styles.settingsInfoText}>4/24/2025</div>
+                  <div className={styles.settingsInfoText}>{releaseDate ? releaseDate.toLocaleDateString() : '2025'}</div>
                 </div>
               </div>
             </div>

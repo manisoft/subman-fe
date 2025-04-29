@@ -5,6 +5,7 @@ export function useVersion() {
   const [version, setVersion] = useState<string|null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string|null>(null);
+  const [releaseDate, setReleaseDate] = useState<Date|null>(null);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/version`)
@@ -14,6 +15,7 @@ export function useVersion() {
       })
       .then(data => {
         setVersion(data.version);
+        setReleaseDate(data.release_date ? new Date(data.release_date) : null);
         setLoading(false);
       })
       .catch(err => {
@@ -22,5 +24,5 @@ export function useVersion() {
       });
   }, []);
 
-  return { version, loading, error };
+  return { version, loading, error, releaseDate };
 }

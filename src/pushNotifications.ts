@@ -10,17 +10,24 @@ export async function subscribeUserToPush(token: string) {
   const reg = await navigator.serviceWorker.ready;
   // You should use your own VAPID public key here (for demo, left blank)
   const vapidPublicKey = process.env.REACT_APP_VAPID_PUBLIC_KEY || '';
-  if (!vapidPublicKey) throw new Error('VAPID public key not set');
+  if (!vapidPublicKey) {
+    // Instead of throwing, return a clear error for the UI to handle
+    return { error: 'Push notifications are not enabled for this installation. Please contact support.' };
+  }
 
-  const subscription = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
-  });
-
-  // Register with backend
-  await apiRequest('/push/subscribe', 'POST', subscription, token);
-  return subscription;
+  try {
+    const subscription = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
+    });
+    // Register with backend
+    await apiRequest('/push/subscribe', 'POST', subscription, token);
+    return subscription;
+  } catch (err: any) {
+    return { error: err.message || 'Failed to subscribe to push notifications.' };
+  }
 }
+
 
 export async function unsubscribeUserFromPush(token: string) {
   const reg = await navigator.serviceWorker.ready;

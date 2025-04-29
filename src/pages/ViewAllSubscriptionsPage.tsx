@@ -221,6 +221,7 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
         )}
 
       </main>
+      {/* Footer now shows version from backend (MySQL) */}
       <Footer />
       {/* Delete Confirmation Modal */}
       <Dialog open={!!confirmDeleteId} modalType="alert" onOpenChange={(_e, data) => { if (!data.open) handleDeleteCancel(); }}>

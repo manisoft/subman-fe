@@ -74,8 +74,15 @@ function App({ colorMode, setColorMode }: AppProps) {
           setPushEnabled(false);
           return;
         }
-        await subscribeUserToPush(token);
+        const result = await subscribeUserToPush(token);
+        if (result && typeof result === 'object' && 'error' in result) {
+          alert(result.error);
+          setPushEnabled(false);
+          return;
+        }
         setPushEnabled(true);
+        // Auto-refresh to update UI for push enabled
+        setTimeout(() => window.location.reload(), 500);
       }
     } catch (e: any) {
       alert(e.message || "Push notification error");
