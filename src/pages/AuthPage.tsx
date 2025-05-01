@@ -24,7 +24,11 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
   // Redirect to dashboard if already logged in
   useEffect(() => {
     if (token && user) {
-      navigate('/dashboard', { replace: true });
+      if (user.role === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     }
   }, [token, user, navigate]);
 
@@ -73,13 +77,13 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
             {mode === 'register' && (
               <>
                 <Label htmlFor="auth-name" style={{ color: 'var(--auth-text-color)' }}>Name</Label>
-                <Input id="auth-name" value={name} onChange={e => setName((e.target as HTMLInputElement).value)} required size="large"/>
+                <Input id="auth-name" value={name} onChange={e => setName((e.target as HTMLInputElement).value)} required size="large" />
               </>
             )}
             <Label htmlFor="auth-email" style={{ color: 'var(--auth-text-color)' }}>Email</Label>
-            <Input id="auth-email" type="email" value={email} onChange={e => setEmail((e.target as HTMLInputElement).value)} required size="large"/>
+            <Input id="auth-email" type="email" value={email} onChange={e => setEmail((e.target as HTMLInputElement).value)} required size="large" />
             <Label htmlFor="auth-password" style={{ color: 'var(--auth-text-color)' }}>Password</Label>
-            <Input id="auth-password" type="password" value={password} onChange={e => setPassword((e.target as HTMLInputElement).value)} required size="large"/>
+            <Input id="auth-password" type="password" value={password} onChange={e => setPassword((e.target as HTMLInputElement).value)} required size="large" />
             {error && <Text style={{ color: error.startsWith('Registration') ? tokens.colorPaletteGreenForeground1 : tokens.colorPaletteRedForeground1, textAlign: 'center' }}>{error}</Text>}
             <div className={styles['auth-footer']}>
               <Button appearance="primary" type="submit" disabled={loading} style={{ width: '100%', marginTop: 40 }} size="large">

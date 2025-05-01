@@ -11,6 +11,10 @@ import TermsOfServicePage from './pages/TermsOfServicePage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import AboutUsPage from './pages/AboutUsPage';
 import ContactUsPage from './pages/ContactUsPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminSettingsPage from './pages/AdminSettingsPage';
+import AdminPagesPage from './pages/AdminPagesPage';
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import { subscribeUserToPush, unsubscribeUserFromPush } from './pushNotifications';
 import GoogleAnalytics from './GoogleAnalytics';
 
@@ -29,7 +33,7 @@ interface AppProps {
 
 function App({ colorMode, setColorMode }: AppProps) {
   const classes = useStyles();
-  const [token, setToken] = React.useState<string|null>(() => localStorage.getItem('token'));
+  const [token, setToken] = React.useState<string | null>(() => localStorage.getItem('token'));
   const [user, setUser] = React.useState<any>(() => {
     const stored = localStorage.getItem('user');
     return stored ? JSON.parse(stored) : null;
@@ -53,6 +57,7 @@ function App({ colorMode, setColorMode }: AppProps) {
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    window.location.href = '/auth';
   };
 
   // Push notification toggling
@@ -120,6 +125,15 @@ function App({ colorMode, setColorMode }: AppProps) {
           <Route path="/subscriptions" element={token ? <ViewAllSubscriptionsPage token={token} user={user} /> : <Navigate to="/auth" />} />
           <Route path="/profile" element={token ? <UserProfilePage user={user} token={token} onLogout={handleLogout} /> : <Navigate to="/auth" />} />
           <Route path="/settings" element={token ? <SettingsPage colorMode={colorMode} setColorMode={setColorMode} pushEnabled={pushEnabled} pushLoading={pushLoading} onPushToggle={handlePushToggle} /> : <Navigate to="/auth" />} />
+          {/* Admin routes - only for admin users */}
+          {token && user?.role === 'admin' && (
+            <>
+              <Route path="/admin/dashboard" element={<AdminDashboardPage token={token} user={user} onLogout={handleLogout} />} />
+              <Route path="/admin/settings" element={<AdminSettingsPage token={token} user={user} onLogout={handleLogout} />} />
+              <Route path="/admin/pages" element={<AdminPagesPage token={token} user={user} onLogout={handleLogout} />} />
+              <Route path="/admin/analytics" element={<AdminAnalyticsPage token={token} user={user} onLogout={handleLogout} />} />
+            </>
+          )}
           {/* Default route: if authenticated go to dashboard, else to auth */}
           <Route path="*" element={<Navigate to={token ? "/dashboard" : "/auth"} />} />
         </Routes>
