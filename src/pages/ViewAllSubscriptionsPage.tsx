@@ -32,6 +32,11 @@ const formatFriendlyDate = (dateString: string | null | undefined): string => {
   }
 };
 
+// Helper to convert a string to Title Case
+function toTitleCase(str: string): string {
+  return str.replace(/\w\S*/g, (txt: string) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+}
+
 interface Subscription {
   id: string;
   name: string;
@@ -126,22 +131,22 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
         ) : (
           <div className={styles.subsgrid}>
             {pagedSubs.map(sub => (
-                          <motion.div key={sub.id}
-                          whileHover={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
-                          whileFocus={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
-                          transition={{ type: 'spring', stiffness: 240, damping: 22, mass: 0.9 }}
-                          style={{ borderRadius: '0.5rem' }}
-                        >
-              <Card
-                key={sub.id}
-                className={`${styles.fluentCard} shadow-sm fluent-card fluent-reveal-effect`}
-                style={{ minHeight: 260, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
-                tabIndex={0}
+              <motion.div key={sub.id}
+                whileHover={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
+                whileFocus={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
+                transition={{ type: 'spring', stiffness: 240, damping: 22, mass: 0.9 }}
+                style={{ borderRadius: '0.5rem' }}
               >
-                <div style={{ padding: 24, paddingBottom: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      {sub.logo ? (
+                <Card
+                  key={sub.id}
+                  className={`${styles.fluentCard} shadow-sm fluent-card fluent-reveal-effect`}
+                  style={{ minHeight: 260, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+                  tabIndex={0}
+                >
+                  <div style={{ padding: 24, paddingBottom: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        {sub.logo ? (
                           <div
                             style={{
                               width: 40,
@@ -162,42 +167,42 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
                             />
                           </div>
                         ) : (
-                        <div style={{ width: 40, height: 40, borderRadius: '50%', background: sub.color || '#f00', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <span style={{ color: '#fff', fontWeight: 500, fontSize: 16 }}>{sub.name.slice(0,2).toUpperCase()}</span>
+                          <div style={{ width: 40, height: 40, borderRadius: '50%', background: sub.color || '#f00', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <span style={{ color: '#fff', fontWeight: 500, fontSize: 16 }}>{sub.name.slice(0, 2).toUpperCase()}</span>
+                          </div>
+                        )}
+                        <div>
+                          <h3 style={{ fontWeight: 600, fontSize: 20, margin: 0 }}>{sub.name}</h3>
+                          <p style={{ fontSize: 14, color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{toTitleCase(sub.category || 'Uncategorized')}</p>
                         </div>
-                      )}
-                      <div>
-                        <h3 style={{ fontWeight: 600, fontSize: 20, margin: 0 }}>{sub.name}</h3>
-                        <p style={{ fontSize: 14, color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{sub.category || 'Uncategorized'}</p>
+                      </div>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <Button appearance="subtle" icon={<ColorLineRegular />} onClick={e => { e.stopPropagation(); handleEdit(sub.id); }} />
+                        <Button appearance="subtle" icon={<DeleteRegular style={{ color: 'red' }} />} onClick={e => { e.stopPropagation(); handleDeleteClick(sub.id); }} />
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 4 }}>
-                      <Button appearance="subtle" icon={<ColorLineRegular />} onClick={e => { e.stopPropagation(); handleEdit(sub.id); }} />
-                      <Button appearance="subtle" icon={<DeleteRegular style={{ color: 'red' }} />} onClick={e => { e.stopPropagation(); handleDeleteClick(sub.id); }} />
+                  </div>
+                  <div style={{ padding: 24, paddingTop: 0 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 14 }}>
+                      <div>
+                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Price</p>
+                        <p style={{ fontWeight: 500, margin: 0 }}>${Number(sub.price).toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Billing Cycle</p>
+                        <p style={{ fontWeight: 500, margin: 0, textTransform: 'capitalize' }}>{sub.billing_cycle}</p>
+                      </div>
+                      <div>
+                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Next Payment</p>
+                        <p style={{ fontWeight: 500, margin: 0 }}>{sub.next_billing_date ? formatFriendlyDate(sub.next_billing_date) : 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Added On</p>
+                        <p style={{ fontWeight: 500, margin: 0 }}>{sub.created_at ? formatFriendlyDate(sub.created_at) : 'N/A'}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div style={{ padding: 24, paddingTop: 0 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 14 }}>
-                    <div>
-                      <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Price</p>
-                      <p style={{ fontWeight: 500, margin: 0 }}>${Number(sub.price).toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Billing Cycle</p>
-                      <p style={{ fontWeight: 500, margin: 0, textTransform: 'capitalize' }}>{sub.billing_cycle}</p>
-                    </div>
-                    <div>
-                      <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Next Payment</p>
-                      <p style={{ fontWeight: 500, margin: 0 }}>{sub.next_billing_date ? formatFriendlyDate(sub.next_billing_date) : 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Added On</p>
-                      <p style={{ fontWeight: 500, margin: 0 }}>{sub.created_at ? formatFriendlyDate(sub.created_at) : 'N/A'}</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+                </Card>
               </motion.div>
             ))}
           </div>
@@ -225,30 +230,30 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
       <Footer />
       {/* Delete Confirmation Modal */}
       <Dialog open={!!confirmDeleteId} modalType="alert" onOpenChange={(_e, data) => { if (!data.open) handleDeleteCancel(); }}>
-  <DialogSurface className="delete-dialog-surface">
-    <DialogBody>
-      <DialogTitle as="h2" action={<DeleteDismissRegular style={{ color: 'red', fontSize: 24 }}/>}>
-        Delete Subscription
-      </DialogTitle>
-      <div style={{ margin: '20px 0', fontSize: 16 }}>
-        This will permanently delete the subscription <b>"{subs.find(s => s.id === confirmDeleteId)?.name || ''}"</b>. This action cannot be undone.
-      </div>
-      <DialogActions>
-        <Button appearance="secondary" onClick={handleDeleteCancel}>Cancel</Button>
-        <Button
-          appearance="primary"
-          icon={<DeleteDismissRegular style={{ color: 'white' }} />}
-          onClick={handleDeleteConfirm}
-          style={{ background: 'rgba(239, 68, 68, 0.9)', borderColor: 'rgba(239, 68, 68, 0.9)', color: '#fff' }}
-          disabled={deleteLoading}
-        >
-          {deleteLoading ? <Spinner size="tiny" style={{ marginRight: 8, verticalAlign: 'middle' }} /> : null}
-          Delete
-        </Button>
-      </DialogActions>
-    </DialogBody>
-  </DialogSurface>
-</Dialog>
+        <DialogSurface className="delete-dialog-surface">
+          <DialogBody>
+            <DialogTitle as="h2" action={<DeleteDismissRegular style={{ color: 'red', fontSize: 24 }} />}>
+              Delete Subscription
+            </DialogTitle>
+            <div style={{ margin: '20px 0', fontSize: 16 }}>
+              This will permanently delete the subscription <b>"{subs.find(s => s.id === confirmDeleteId)?.name || ''}"</b>. This action cannot be undone.
+            </div>
+            <DialogActions>
+              <Button appearance="secondary" onClick={handleDeleteCancel}>Cancel</Button>
+              <Button
+                appearance="primary"
+                icon={<DeleteDismissRegular style={{ color: 'white' }} />}
+                onClick={handleDeleteConfirm}
+                style={{ background: 'rgba(239, 68, 68, 0.9)', borderColor: 'rgba(239, 68, 68, 0.9)', color: '#fff' }}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? <Spinner size="tiny" style={{ marginRight: 8, verticalAlign: 'middle' }} /> : null}
+                Delete
+              </Button>
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
     </div>
   );
 }

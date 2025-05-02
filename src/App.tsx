@@ -15,6 +15,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminSettingsPage from './pages/AdminSettingsPage';
 import AdminPagesPage from './pages/AdminPagesPage';
 import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
+import AdminPopularServicesPage from './pages/AdminPopularServicesPage';
 import { subscribeUserToPush, unsubscribeUserFromPush } from './pushNotifications';
 import GoogleAnalytics from './GoogleAnalytics';
 
@@ -132,6 +133,7 @@ function App({ colorMode, setColorMode }: AppProps) {
               <Route path="/admin/settings" element={<AdminSettingsPage token={token} user={user} onLogout={handleLogout} />} />
               <Route path="/admin/pages" element={<AdminPagesPage token={token} user={user} onLogout={handleLogout} />} />
               <Route path="/admin/analytics" element={<AdminAnalyticsPage token={token} user={user} onLogout={handleLogout} />} />
+              <Route path="/admin/popular-services" element={<AdminPopularServicesPage token={token} user={user} onLogout={handleLogout} />} />
             </>
           )}
           {/* Default route: if authenticated go to dashboard, else to auth */}

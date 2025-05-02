@@ -6,6 +6,7 @@ const navLinks = [
     { name: 'Settings', key: '/admin/settings' },
     { name: 'Pages', key: '/admin/pages' },
     { name: 'Analytics', key: '/admin/analytics' },
+    { name: 'Popular Services', key: '/admin/popular-services' },
 ];
 
 const useStyles = makeStyles({

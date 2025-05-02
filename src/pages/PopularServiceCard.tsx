@@ -9,6 +9,11 @@ interface PopularServiceCardProps {
   index: number;
 }
 
+// Helper to convert a string to Title Case
+function toTitleCase(str: string): string {
+  return str.replace(/\w\S*/g, (txt: string) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+}
+
 const getTextColorForBackground = (bgColor: string): string => {
   // Use tokens for default colors
   const defaultBg = '#e5e7eb';
@@ -76,7 +81,7 @@ export default function PopularServiceCard({ service, index }: PopularServiceCar
         {/* Subscription Name */}
         <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 10, color: textColor }}>{service.name}</div>
         {/* Categories */}
-        <div style={{ fontSize: 14, color: textColor, opacity: 0.7, marginBottom: 0 }}>{categories}</div>
+        <div style={{ fontSize: 14, color: textColor, opacity: 0.7, marginBottom: 0 }}>{Array.isArray(service.categories) ? service.categories.map((cat: string) => toTitleCase(cat)).join(', ') : toTitleCase(service.categories || '')}</div>
       </Card>
     </motion.div>
   );
