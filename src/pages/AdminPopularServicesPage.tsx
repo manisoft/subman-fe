@@ -2,6 +2,7 @@ import * as React from 'react';
 import { AdminNav } from '../components/AdminNav';
 import { Card, CardHeader, Text, Button, Input, Spinner, Label, Dialog, DialogSurface, DialogBody, DialogTitle, DialogActions, Dropdown, Option, FluentProvider, webLightTheme, webDarkTheme, tokens } from '@fluentui/react-components';
 import { apiRequest } from '../api';
+import styles from './AdminPopularServicesPage.module.css';
 
 export default function AdminPopularServicesPage({ token, user, onLogout }: { token: string; user: any; onLogout: () => void }) {
     // Theme state from localStorage or system
@@ -95,7 +96,8 @@ export default function AdminPopularServicesPage({ token, user, onLogout }: { to
         setError('');
         setSuccess('');
         const payload = { ...form };
-        if (editId && editId > 0) {
+        if (editId && typeof editId === 'string') {
+            // Edit mode: call PUT with the correct id
             apiRequest(`/popular-services/${editId}`, 'PUT', payload, token)
                 .then(() => {
                     setSuccess('Service updated.');
@@ -105,6 +107,7 @@ export default function AdminPopularServicesPage({ token, user, onLogout }: { to
                 .catch(e => setError(e.message || 'Update failed'))
                 .finally(() => setSaving(false));
         } else {
+            // Add mode: call POST
             apiRequest('/popular-services', 'POST', payload, token)
                 .then(() => {
                     setSuccess('Service added.');
@@ -121,32 +124,83 @@ export default function AdminPopularServicesPage({ token, user, onLogout }: { to
         return str.replace(/\w\S*/g, (txt: string) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
     }
 
+    // Pagination component (custom, Fluent UI v9 compatible)
+    function CustomPagination({ page, totalPages, onChange }: { page: number; totalPages: number; onChange: (page: number) => void }) {
+        if (totalPages <= 1) return null;
+        const pages = [];
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+        return (
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+                <Button appearance="subtle" disabled={page === 1} onClick={() => onChange(page - 1)}>Prev</Button>
+                {pages.map(p => (
+                    <Button
+                        key={p}
+                        appearance={p === page ? 'primary' : 'subtle'}
+                        onClick={() => onChange(p)}
+                        style={{ minWidth: 36, fontWeight: 600 }}
+                    >
+                        {p}
+                    </Button>
+                ))}
+                <Button appearance="subtle" disabled={page === totalPages} onClick={() => onChange(page + 1)}>Next</Button>
+            </div>
+        );
+    }
+
+    // Pagination state
+    const [page, setPage] = React.useState(1);
+    const PAGE_SIZE = 40;
+    const pagedServices = services.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    const totalPages = Math.ceil(services.length / PAGE_SIZE) || 1;
+
     return (
         <FluentProvider theme={colorMode === 'dark' ? webDarkTheme : webLightTheme} style={{ minHeight: '100dvh', background: tokens.colorNeutralBackground1 }}>
-            <div style={{ display: 'flex', minHeight: '100dvh', background: tokens.colorNeutralBackground1 }}>
+            <div style={{ display: 'flex', minHeight: '100dvh', background: tokens.colorNeutralBackground1, height: '100dvh', overflow: 'hidden', width: '100vw' }}>
                 <AdminNav selected="/admin/popular-services" onLogout={onLogout} />
-                <main style={{ flex: 1, padding: '5vw 4vw', maxWidth: 900, width: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', gap: 32 }}>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: 24 }}>Popular Services</h1>
-                    <Button appearance="primary" onClick={handleAdd} style={{ maxWidth: 200, marginBottom: 24 }}>Add New Service</Button>
+                <main
+                    style={{
+                        flex: 1,
+                        padding: '0',
+                        maxWidth: '100%',
+                        width: '100%',
+                        boxSizing: 'border-box',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 24,
+                        height: '100vh',
+                        overflowY: 'auto',
+                        background: tokens.colorNeutralBackground1,
+                    }}
+                >
+                    <h1 style={{ fontSize: '2rem', fontWeight: 700, marginLeft: '3rem' }}>Popular Services</h1>
+                    <Button appearance="primary" onClick={handleAdd} style={{ maxWidth: 200, marginBottom: 24, marginLeft: '3rem' }}>Add New Service</Button>
                     {loading ? <Spinner size="large" /> : error ? <Text style={{ color: tokens.colorPaletteRedForeground1 }}>{error}</Text> : (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24 }}>
-                            {services.map(service => (
-                                <Card key={service.id} style={{ flex: '1 1 260px', minWidth: 260, maxWidth: 320, background: tokens.colorNeutralBackground2, position: 'relative' }}>
-                                    <CardHeader header={<Text weight="semibold" size={400}>{service.name}</Text>} />
-                                    <div style={{ margin: '12px 0' }}>
-                                        <img src={service.logo} alt={service.name} style={{ width: 48, height: 48, borderRadius: 8, background: '#fff', objectFit: 'contain' }} />
-                                    </div>
-                                    <Text size={300} style={{ color: tokens.colorNeutralForeground2 }}>Color: <span style={{ background: service.color, padding: '2px 12px', borderRadius: 8, marginLeft: 8 }}>{service.color}</span></Text>
-                                    <Text size={300} style={{ color: tokens.colorNeutralForeground2, display: 'block', marginTop: 8 }}>
-                                        Categories: {service.categories.split(',').map((cat: string) => toTitleCase(cat.trim())).join(', ')}
-                                    </Text>
-                                    <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                                        <Button appearance="secondary" onClick={() => handleEdit(service)}>Edit</Button>
-                                        <Button appearance="subtle" onClick={() => handleDelete(service.id)} style={{ color: tokens.colorPaletteRedForeground1 }}>Delete</Button>
-                                    </div>
-                                </Card>
-                            ))}
-                        </div>
+                        <>
+                            <div
+                                className={styles.cardGrid}
+                                style={undefined}
+                            >
+                                {pagedServices.map(service => (
+                                    <Card key={service.id} style={{ flex: '1 1 260px', minWidth: 260, maxWidth: 320, background: tokens.colorNeutralBackground2, position: 'relative' }}>
+                                        <CardHeader header={<Text weight="semibold" size={400}>{service.name}</Text>} />
+                                        <div style={{ margin: '12px 0' }}>
+                                            <img src={service.logo} alt={service.name} style={{ width: 48, height: 48, borderRadius: 8, background: '#fff', objectFit: 'contain', padding: '2%' }} />
+                                        </div>
+                                        <Text size={300} style={{ color: tokens.colorNeutralForeground2 }}>Color: <span style={{ background: service.color, padding: '2px 12px', borderRadius: 8, marginLeft: 8 }}>{service.color}</span></Text>
+                                        <Text size={300} style={{ color: tokens.colorNeutralForeground2, display: 'block', marginTop: 8 }}>
+                                            Categories: {service.categories.split(',').map((cat: string) => toTitleCase(cat.trim())).join(', ')}
+                                        </Text>
+                                        <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+                                            <Button appearance="secondary" onClick={() => handleEdit(service)}>Edit</Button>
+                                            <Button appearance="subtle" onClick={() => handleDelete(service.id)} style={{ color: tokens.colorPaletteRedForeground1 }}>Delete</Button>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                            <div style={{ margin: '32px 0' }}>
+                                <CustomPagination page={page} totalPages={totalPages} onChange={setPage} />
+                            </div>
+                        </>
                     )}
                     {/* Add/Edit Dialog */}
                     <Dialog open={editId !== null} modalType="alert" onOpenChange={(_e, data) => { if (!data.open) setEditId(null); }}>

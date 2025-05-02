@@ -1,0 +1,34 @@
+.cardGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    width: 100%;
+    margin: 0;
+    padding: 0 32px 32px 32px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+    .cardGrid {
+        gap: 10px !important;
+        padding: 0 8px 16px 8px;
+    }
+}
+
+main {
+    scrollbar-width: thin;
+    scrollbar-color: var(--fluent-colorNeutralStroke1, #d1d5db) var(--fluent-colorNeutralBackground1, #fff);
+}
+
+main::-webkit-scrollbar {
+    width: 8px;
+}
+
+main::-webkit-scrollbar-thumb {
+    background: var(--fluent-colorNeutralStroke1, #d1d5db);
+    border-radius: 8px;
+}
+
+main::-webkit-scrollbar-track {
+    background: var(--fluent-colorNeutralBackground1, #fff);
+}
