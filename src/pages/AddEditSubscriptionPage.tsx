@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './AddEditSubscriptionPage.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input, Label, Text, Spinner, Dropdown, Option } from '@fluentui/react-components';
-import { ColorRegular, SaveRegular, AddFilled } from '@fluentui/react-icons';
+import { ColorRegular, SaveRegular, AddFilled, Search24Regular } from '@fluentui/react-icons';
 
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { apiRequest } from '../api';
@@ -84,6 +84,9 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
   const [color, setColor] = useState(state?.color || '#e5e7eb');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [popularPage, setPopularPage] = useState(1);
+  const POPULAR_PAGE_SIZE = 20;
+  const [popularSearch, setPopularSearch] = useState('');
 
   // Auto-switch to 'custom' tab if prefill data is present and not editing
   useEffect(() => {
@@ -173,6 +176,17 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
     }
   }, [tab, token]);
 
+  // Filter and paginate popular services
+  const filteredPopularServices = popularServices.filter(service => {
+    const search = popularSearch.toLowerCase();
+    return (
+      service.name?.toLowerCase().includes(search) ||
+      (service.categories || '').toLowerCase().includes(search)
+    );
+  });
+  const totalPopularPages = Math.ceil(filteredPopularServices.length / POPULAR_PAGE_SIZE) || 1;
+  const pagedPopularServices = filteredPopularServices.slice((popularPage - 1) * POPULAR_PAGE_SIZE, popularPage * POPULAR_PAGE_SIZE);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
@@ -241,6 +255,15 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
               >
                 {tab === 'popular' ? (
                   <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+                      <Input
+                        value={popularSearch}
+                        onChange={e => { setPopularSearch((e.target as HTMLInputElement).value); setPopularPage(1); }}
+                        placeholder="Search popular subscriptions..."
+                        contentBefore={<Search24Regular />}
+                        style={{ width: '100%', margin: '0 16px' }}
+                      />
+                    </div>
                     {loadingPopular ? (
                       <div className={styles.addeditCardPopular}>
                         {Array.from({ length: 4 }).map((_, idx) => (
@@ -250,15 +273,34 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                     ) : popularError ? (
                       <Text style={{ color: 'var(--fluent-colorPaletteRedForeground1, red)' }}>{popularError}</Text>
                     ) : (
-                      <div className={styles.addeditCardPopular}>
-                        {popularServices.map((service, idx) => (
-                          <React.Fragment key={service.id}>
-                            {/* Use the new PopularServiceCard component */}
-                            {/* @ts-ignore - PopularServiceCard is default export */}
-                            {React.createElement(require('./PopularServiceCard').default, { service, index: idx })}
-                          </React.Fragment>
-                        ))}
-                      </div>
+                      <>
+                        <div className={styles.addeditCardPopular}>
+                          {pagedPopularServices.map((service, idx) => (
+                            <React.Fragment key={service.id}>
+                              {/* Use the new PopularServiceCard component */}
+                              {/* @ts-ignore - PopularServiceCard is default export */}
+                              {React.createElement(require('./PopularServiceCard').default, { service, index: idx })}
+                            </React.Fragment>
+                          ))}
+                        </div>
+                        {/* Pagination */}
+                        {totalPopularPages > 1 && (
+                          <div style={{ display: 'flex', justifyContent: 'center', margin: '32px 0 20px 0', paddingBottom: 20 }}>
+                            <Button appearance="subtle" disabled={popularPage === 1} onClick={() => setPopularPage(popularPage - 1)} style={{ marginRight: 8 }}>Previous</Button>
+                            {[...Array(totalPopularPages)].map((_, idx) => (
+                              <Button
+                                key={idx}
+                                appearance={popularPage === idx + 1 ? 'primary' : 'subtle'}
+                                onClick={() => setPopularPage(idx + 1)}
+                                style={{ margin: '0 2px' }}
+                              >
+                                {idx + 1}
+                              </Button>
+                            ))}
+                            <Button appearance="subtle" disabled={popularPage === totalPopularPages} onClick={() => setPopularPage(popularPage + 1)} style={{ marginLeft: 8 }}>Next</Button>
+                          </div>
+                        )}
+                      </>
                     )}
                   </>
                 ) : (
@@ -307,7 +349,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                             }
                           }}
                         >
-                        {CATEGORIES.map(c => (
+                          {CATEGORIES.map(c => (
                             <Option key={c.key} value={c.text}>{c.text}</Option>
                           ))}
                         </Dropdown>
@@ -339,7 +381,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                         {error && <Text style={{ color: 'var(--fluent-colorPaletteRedForeground1, red)' }}>{error}</Text>}
                         <Button className={styles["cancel-btn"]} appearance="subtle" type="button" onClick={() => navigate('/subscriptions')}>Cancel</Button>
                         <Button appearance="primary" type="submit" disabled={loading}>
-                          {loading ? <Spinner size="tiny" /> : isEdit ? <><SaveRegular style={{marginRight: 6}} />Save</> : <><AddFilled style={{marginRight: 6}} />Add</>}
+                          {loading ? <Spinner size="tiny" /> : isEdit ? <><SaveRegular style={{ marginRight: 6 }} />Save</> : <><AddFilled style={{ marginRight: 6 }} />Add</>}
                         </Button>
                       </div>
                     </form>
