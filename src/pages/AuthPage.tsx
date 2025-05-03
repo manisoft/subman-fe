@@ -115,16 +115,26 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
               </Button>
             </div>
           </form>
-          {/* Remove Google sign up option: Only show Google sign in for login mode */}
+          {/* Social login buttons in one row, same design */}
           {mode === 'login' && (
-            <Button
-              appearance="primary"
-              onClick={() => window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/google?mode=${mode}`}
-              style={{ width: '100%', marginTop: 16, marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
-            >
-              <img src="/google-g-logo.svg" alt="Google logo" style={{ width: 22, height: 22, marginRight: 8, background: 'white', borderRadius: '50%' }} />
-              Sign in with Google
-            </Button>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: 12, width: '100%', margin: '16px 0' }}>
+              <Button
+                appearance="primary"
+                onClick={() => window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/google?mode=${mode}`}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, background: '#fff', color: '#111', border: '1px solid #e5e7eb', fontWeight: 600 }}
+              >
+                <img src="/google-g-logo.svg" alt="Google logo" style={{ width: 22, height: 22, marginRight: 8, background: 'white', borderRadius: '50%' }} />
+                Sign in with Google
+              </Button>
+              <Button
+                appearance="primary"
+                onClick={() => window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/microsoft`}
+                style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, background: '#fff', color: '#111', border: '1px solid #e5e7eb', fontWeight: 600 }}
+              >
+                <svg width="22" height="22" viewBox="0 0 48 48" style={{ marginRight: 8, background: 'white', borderRadius: 3 }}><g><rect fill="#F25022" x="2" y="2" width="20" height="20" /><rect fill="#7FBA00" x="26" y="2" width="20" height="20" /><rect fill="#00A4EF" x="2" y="26" width="20" height="20" /><rect fill="#FFB900" x="26" y="26" width="20" height="20" /></g></svg>
+                Sign in with Microsoft
+              </Button>
+            </div>
           )}
           <div style={{ marginTop: tokens.spacingVerticalL, textAlign: 'center', width: '100%' }}>
             <span style={{ color: 'var(--auth-subtitle-color)', fontSize: tokens.fontSizeBase200 }}>
