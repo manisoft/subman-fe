@@ -285,19 +285,51 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                         </div>
                         {/* Pagination */}
                         {totalPopularPages > 1 && (
-                          <div style={{ display: 'flex', justifyContent: 'center', margin: '32px 0 20px 0', paddingBottom: 20 }}>
-                            <Button appearance="subtle" disabled={popularPage === 1} onClick={() => setPopularPage(popularPage - 1)} style={{ marginRight: 8 }}>Previous</Button>
+                          <div
+                            style={{
+                              display: 'flex',
+                              flexWrap: 'wrap',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              margin: '32px 0 20px 0',
+                              paddingBottom: 20,
+                              gap: 4,
+                              width: '100%',
+                              maxWidth: '100vw',
+                              boxSizing: 'border-box',
+                            }}
+                          >
+                            <Button
+                              appearance="subtle"
+                              disabled={popularPage === 1}
+                              onClick={() => setPopularPage(popularPage - 1)}
+                              style={{ marginRight: 4, minWidth: 36, flex: '0 0 auto' }}
+                            >
+                              Previous
+                            </Button>
                             {[...Array(totalPopularPages)].map((_, idx) => (
                               <Button
                                 key={idx}
                                 appearance={popularPage === idx + 1 ? 'primary' : 'subtle'}
                                 onClick={() => setPopularPage(idx + 1)}
-                                style={{ margin: '0 2px' }}
+                                style={{
+                                  margin: '0 2px',
+                                  minWidth: 36,
+                                  flex: '0 0 auto',
+                                  padding: '0 8px',
+                                }}
                               >
                                 {idx + 1}
                               </Button>
                             ))}
-                            <Button appearance="subtle" disabled={popularPage === totalPopularPages} onClick={() => setPopularPage(popularPage + 1)} style={{ marginLeft: 8 }}>Next</Button>
+                            <Button
+                              appearance="subtle"
+                              disabled={popularPage === totalPopularPages}
+                              onClick={() => setPopularPage(popularPage + 1)}
+                              style={{ marginLeft: 4, minWidth: 36, flex: '0 0 auto' }}
+                            >
+                              Next
+                            </Button>
                           </div>
                         )}
                       </>
