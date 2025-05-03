@@ -4,7 +4,7 @@ import { Button, Input, Label, Text, Spinner } from '@fluentui/react-components'
 import styles from './AuthPage.module.css';
 import { login, register } from '../api';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface AuthPageProps {
   onAuth: (token: string, user: any) => void;
@@ -20,6 +20,7 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Redirect to dashboard if already logged in
   useEffect(() => {
@@ -62,6 +63,17 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
     // After login, theme will be set by SettingsPage based on user preferences
   }, [token, user]);
 
+  // Handle Google OAuth redirect
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('token', token);
+      // Optionally: fetch user info or decode token here
+      navigate('/dashboard');
+    }
+  }, [location, navigate]);
+
   return (
     <>
       <div className={styles['auth-bg']}>
@@ -91,6 +103,13 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
               </Button>
             </div>
           </form>
+          <Button
+            appearance="primary"
+            onClick={() => window.location.href = `${process.env.REACT_APP_API_URL || ''}/api/auth/google`}
+            style={{ width: '100%', marginBottom: 16 }}
+          >
+            Sign in with Google
+          </Button>
           <div style={{ marginTop: tokens.spacingVerticalL, textAlign: 'center', width: '100%' }}>
             <span style={{ color: 'var(--auth-subtitle-color)', fontSize: tokens.fontSizeBase200 }}>
               {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
