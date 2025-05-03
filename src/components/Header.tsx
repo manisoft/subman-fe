@@ -9,7 +9,7 @@ export default function Header({ user }: { user: any }) {
     <header className={styles.headerContainer}>
       <div
         className={styles.logoBrand}
-        onClick={() => { if (user) window.location.href = '/dashboard'; }}
+        onClick={() => { if (user) window.location.href = user.role === 'admin' ? '/admin/dashboard' : '/dashboard'; }}
         tabIndex={user ? 0 : -1}
         role="button"
         aria-label="Go to dashboard"

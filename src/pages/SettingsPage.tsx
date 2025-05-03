@@ -8,6 +8,7 @@ import styles from './SettingsPage.module.css';
 import { useVersion } from '../hooks/useVersion';
 
 interface SettingsPageProps {
+  user: any;
   colorMode: 'light' | 'dark';
   setColorMode: (mode: 'light' | 'dark') => void;
   pushEnabled: boolean;
@@ -15,7 +16,7 @@ interface SettingsPageProps {
   onPushToggle: () => void;
 }
 
-export default function SettingsPage({ colorMode, setColorMode, pushEnabled, pushLoading, onPushToggle }: SettingsPageProps) {
+export default function SettingsPage({ user, colorMode, setColorMode, pushEnabled, pushLoading, onPushToggle }: SettingsPageProps) {
   // Check browser notification permission
   const [permission, setPermission] = React.useState(Notification.permission);
   const prevPermission = React.useRef(permission);
@@ -32,7 +33,7 @@ export default function SettingsPage({ colorMode, setColorMode, pushEnabled, pus
 
   return (
     <div className={styles.pageRoot}>
-      <Header user={window.localStorage.getItem('user') ? JSON.parse(window.localStorage.getItem('user')!) : undefined} />
+      <Header user={user} />
       <div className={styles.settingsBg}>
         <main className={styles.settingsContainer}>
           <div style={{ maxWidth: 700, margin: '0 auto' }}>
@@ -71,23 +72,23 @@ export default function SettingsPage({ colorMode, setColorMode, pushEnabled, pus
                 <p className={styles.settingsSectionDesc}>Manage how you receive notifications about your subscriptions</p>
               </div>
               <div style={{ padding: 24, paddingTop: 0 }}>
-              <div className={styles.settingsRow} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-    <AlertRegular style={{ color: tokens.colorPaletteBlueForeground2, fontSize: 22 }} />
-    <Label>Push Notifications</Label>
-  </div>
-  {permission !== 'granted' && (
-    <Button appearance="primary" disabled={pushLoading} onClick={onPushToggle}>
-      Allow Notification
-    </Button>
-  )}
-</div>
+                <div className={styles.settingsRow} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <AlertRegular style={{ color: tokens.colorPaletteBlueForeground2, fontSize: 22 }} />
+                    <Label>Push Notifications</Label>
+                  </div>
+                  {permission !== 'granted' && (
+                    <Button appearance="primary" disabled={pushLoading} onClick={onPushToggle}>
+                      Allow Notification
+                    </Button>
+                  )}
+                </div>
                 <Text style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', fontSize: tokens.fontSizeBase200, marginTop: tokens.spacingVerticalXS }}>
                   {permission === 'granted'
                     ? "You'll receive notifications about upcoming renewals."
                     : permission === 'denied'
-                    ? "Notifications are blocked in your browser settings."
-                    : "You can enable notifications for this app in your browser by clicking Allow Notification."}
+                      ? "Notifications are blocked in your browser settings."
+                      : "You can enable notifications for this app in your browser by clicking Allow Notification."}
                 </Text>
               </div>
             </div>

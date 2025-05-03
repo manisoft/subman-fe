@@ -46,6 +46,37 @@ function App({ colorMode, setColorMode }: AppProps) {
     setPushEnabled(Notification.permission === 'granted');
   }, []);
 
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    if (storedToken && !token) setToken(storedToken);
+    if (storedUser && !user) setUser(JSON.parse(storedUser));
+  }, []);
+
+  // Sync user/token state from localStorage if changed (for Google Auth or multi-tab)
+  React.useEffect(() => {
+    const handleStorage = () => {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+      if (storedToken !== token) setToken(storedToken);
+      if (storedUser) setUser(JSON.parse(storedUser));
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [token]);
+
+  // Sync user state from localStorage on change (fixes Google Auth ProfileMenu issue)
+  React.useEffect(() => {
+    const handleStorage = () => {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+      if (storedToken !== token) setToken(storedToken);
+      if (storedUser) setUser(JSON.parse(storedUser));
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [token]);
+
   const handleAuth = (t: string, u: any) => {
     setToken(t);
     setUser(u);
@@ -125,7 +156,7 @@ function App({ colorMode, setColorMode }: AppProps) {
           <Route path="/subscription/:id?" element={token ? <AddEditSubscriptionPage token={token} user={user} /> : <Navigate to="/auth" />} />
           <Route path="/subscriptions" element={token ? <ViewAllSubscriptionsPage token={token} user={user} /> : <Navigate to="/auth" />} />
           <Route path="/profile" element={token ? <UserProfilePage user={user} token={token} onLogout={handleLogout} /> : <Navigate to="/auth" />} />
-          <Route path="/settings" element={token ? <SettingsPage colorMode={colorMode} setColorMode={setColorMode} pushEnabled={pushEnabled} pushLoading={pushLoading} onPushToggle={handlePushToggle} /> : <Navigate to="/auth" />} />
+          <Route path="/settings" element={token ? <SettingsPage user={user} colorMode={colorMode} setColorMode={setColorMode} pushEnabled={pushEnabled} pushLoading={pushLoading} onPushToggle={handlePushToggle} /> : <Navigate to="/auth" />} />
           {/* Admin routes - only for admin users */}
           {token && user?.role === 'admin' && (
             <>
