@@ -3,7 +3,6 @@ import { tokens } from '@fluentui/react-components';
 import { Button, Input, Label, Text, Spinner } from '@fluentui/react-components';
 import styles from './AuthPage.module.css';
 import { login, register } from '../api';
-
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface AuthPageProps {
@@ -67,12 +66,16 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
+    const nameFromGoogle = params.get('name');
+    const emailFromGoogle = params.get('email');
     if (token) {
       localStorage.setItem('token', token);
-      // Optionally: fetch user info or decode token here
       navigate('/dashboard');
+    } else if (mode === 'register' && nameFromGoogle && emailFromGoogle) {
+      setName(nameFromGoogle);
+      setEmail(emailFromGoogle);
     }
-  }, [location, navigate]);
+  }, [location, navigate, mode]);
 
   return (
     <>
@@ -105,10 +108,11 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
           </form>
           <Button
             appearance="primary"
-            onClick={() => window.location.href = `${process.env.REACT_APP_API_URL || ''}/api/auth/google`}
-            style={{ width: '100%', marginBottom: 16 }}
+            onClick={() => window.location.href = `${process.env.REACT_APP_API_BASE_URL}/auth/google?mode=${mode}`}
+            style={{ width: '100%', marginTop: 16, marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}
           >
-            Sign in with Google
+            <img src="/google-g-logo.svg" alt="Google logo" style={{ width: 22, height: 22, marginRight: 8, background: 'white', borderRadius: '50%' }} />
+            {mode === 'register' ? 'Sign up with Google' : 'Sign in with Google'}
           </Button>
           <div style={{ marginTop: tokens.spacingVerticalL, textAlign: 'center', width: '100%' }}>
             <span style={{ color: 'var(--auth-subtitle-color)', fontSize: tokens.fontSizeBase200 }}>
