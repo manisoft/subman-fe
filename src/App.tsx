@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { FluentProvider, webLightTheme, webDarkTheme, makeStyles, shorthands, tokens } from '@fluentui/react-components';
+import languageDataRaw from './language.json';
+import React, { useEffect, useState, useMemo, createContext } from 'react';
+import { makeStyles, shorthands, tokens } from '@fluentui/react-components';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
 import DashboardPage from './pages/DashboardPage';
@@ -19,6 +20,15 @@ import AdminPopularServicesPage from './pages/AdminPopularServicesPage';
 import { subscribeUserToPush, unsubscribeUserFromPush } from './pushNotifications';
 import GoogleAnalytics from './GoogleAnalytics';
 
+// Add a type for the language data
+interface LanguageStrings {
+  [key: string]: string;
+}
+interface LanguageData {
+  [locale: string]: LanguageStrings;
+}
+const languageData: LanguageData = languageDataRaw as LanguageData;
+
 const useStyles = makeStyles({
   root: {
     minHeight: '100vh',
@@ -30,6 +40,46 @@ const useStyles = makeStyles({
 interface AppProps {
   colorMode: 'light' | 'dark';
   setColorMode: (mode: 'light' | 'dark') => void;
+}
+
+export const LanguageContext = createContext({
+  language: 'en-US',
+  setLanguage: (lang: string) => { },
+  t: (key: string) => key,
+});
+
+function getInitialLanguage() {
+  return localStorage.getItem('language') || navigator.language || 'en-US';
+}
+
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const [language, setLanguage] = useState(getInitialLanguage());
+
+  const t = useMemo(() => {
+    return (key: string) => {
+      const translation = (languageData[language] && languageData[language][key]) || languageData['en-US'][key];
+      // Fallback: if translation is missing, return a humanized version of the key
+      if (!translation) {
+        return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      }
+      return translation;
+    };
+  }, [language]);
+
+  const value = useMemo(() => ({
+    language,
+    setLanguage: (lang: string) => {
+      setLanguage(lang);
+      localStorage.setItem('language', lang);
+    },
+    t,
+  }), [language, t]);
+
+  return (
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
+  );
 }
 
 function App({ colorMode, setColorMode }: AppProps) {
@@ -77,18 +127,13 @@ function App({ colorMode, setColorMode }: AppProps) {
     return () => window.removeEventListener('storage', handleStorage);
   }, [token]);
 
-  const handleAuth = (t: string, u: any) => {
-    setToken(t);
-    setUser(u);
-    localStorage.setItem('token', t);
-    localStorage.setItem('user', JSON.stringify(u));
-  };
-
+  // Do not clear theme or language on logout
   const handleLogout = () => {
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Do NOT remove colorMode or language from localStorage
     window.location.href = '/auth';
   };
 
@@ -137,6 +182,14 @@ function App({ colorMode, setColorMode }: AppProps) {
       });
     }
   }, [token]);
+
+  // Add handleAuth function before the return statement
+  const handleAuth = (t: string, u: any) => {
+    setToken(t);
+    setUser(u);
+    localStorage.setItem('token', t);
+    localStorage.setItem('user', JSON.stringify(u));
+  };
 
   return (
     <div className={classes.root}>

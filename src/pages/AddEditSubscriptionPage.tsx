@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import styles from './AddEditSubscriptionPage.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, Input, Label, Text, Spinner, Dropdown, Option } from '@fluentui/react-components';
@@ -8,7 +8,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { apiRequest } from '../api';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-
+import { LanguageContext } from '../App';
 
 type DropdownOnChangeData = { optionValue?: string }; // Best practice for Fluent UI v9
 
@@ -58,6 +58,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
   const id = params.id;
   const isEdit = !!id;
   const navigate = useNavigate();
+  const { t } = useContext(LanguageContext);
   // Prefill from location.state (PopularServiceCard)
   const state = location.state as {
     name?: string;
@@ -217,8 +218,6 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
     }
   }
 
-  // ... (rest of the code remains the same)
-
   return (
     <>
       <div className={styles["addedit-card"]}>
@@ -231,7 +230,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
               aria-selected={tab === 'popular'}
               style={{ outline: 'none' }}
             >
-              Popular Services
+              {t('addedit_popular_services') || 'Popular Services'}
             </button>
             <button
               type="button"
@@ -240,7 +239,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
               aria-selected={tab === 'custom'}
               style={{ outline: 'none' }}
             >
-              Custom Subscription
+              {t('addedit_custom_subscription') || 'Custom Subscription'}
             </button>
           </div>
           <div style={{ minHeight: 420 }}>
@@ -259,7 +258,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                       <Input
                         value={popularSearch}
                         onChange={e => { setPopularSearch((e.target as HTMLInputElement).value); setPopularPage(1); }}
-                        placeholder="Search popular subscriptions..."
+                        placeholder={t('addedit_search_placeholder') || 'Search popular subscriptions...'}
                         contentBefore={<Search24Regular />}
                         style={{ width: '100%', margin: '0 16px' }}
                       />
@@ -305,7 +304,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                               onClick={() => setPopularPage(popularPage - 1)}
                               style={{ marginRight: 4, minWidth: 36, flex: '0 0 auto' }}
                             >
-                              Previous
+                              {t('addedit_previous') || 'Previous'}
                             </Button>
                             {[...Array(totalPopularPages)].map((_, idx) => (
                               <Button
@@ -328,7 +327,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                               onClick={() => setPopularPage(popularPage + 1)}
                               style={{ marginLeft: 4, minWidth: 36, flex: '0 0 auto' }}
                             >
-                              Next
+                              {t('addedit_next') || 'Next'}
                             </Button>
                           </div>
                         )}
@@ -338,30 +337,32 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                 ) : (
                   <>
                     <div style={{ fontSize: 28, fontWeight: 600, marginBottom: 24, color: 'var(--fluent-colorNeutralForeground1)' }}>
-                      {isEdit ? 'Edit Subscription' : 'Add Subscription'}
+                      {isEdit ? t('addedit_edit_title') || 'Edit Subscription' : t('addedit_add_title') || 'Add Subscription'}
                     </div>
                     <form className={styles["addedit-form"]} onSubmit={handleSubmit}>
                       <div className={styles["addedit-form-col"]}>
-                        <Label htmlFor="sub-name">Name</Label>
+                        <Label htmlFor="sub-name">{t('addedit_name') || 'Name'}</Label>
                         <Input id="sub-name" className={styles.labelStyles} value={name} onChange={e => setName((e.target as HTMLInputElement).value)} required />
-                        <Label htmlFor="sub-price">Price ($)</Label>
+                        <Label htmlFor="sub-price">{t('addedit_price') || 'Price ($)'}</Label>
                         <Input id="sub-price" type="number" className={styles.labelStyles} value={price} onChange={e => setPrice((e.target as HTMLInputElement).value)} required />
-                        <Label htmlFor="sub-billing">Billing Cycle</Label>
+                        <Label htmlFor="sub-billing">{t('addedit_billing_cycle') || 'Billing Cycle'}</Label>
                         <Dropdown
                           id="sub-billing"
                           value={billingCycle}
-                          placeholder="Select billing cycle"
+                          placeholder={t('addedit_billing_cycle') || 'Select billing cycle'}
                           onOptionSelect={(_event: unknown, data: DropdownOnChangeData) => {
                             if (data.optionValue) {
                               setBillingCycle(data.optionValue);
                             }
                           }}
                         >
-                          {BILLING_CYCLES.map(c => (
-                            <Option key={c.key} value={c.text}>{c.text}</Option>
-                          ))}
+                          <Option value={t('addedit_billing_weekly') || 'Weekly'}>{t('addedit_billing_weekly') || 'Weekly'}</Option>
+                          <Option value={t('addedit_billing_biweekly') || 'Bi-Weekly'}>{t('addedit_billing_biweekly') || 'Bi-Weekly'}</Option>
+                          <Option value={t('addedit_billing_monthly') || 'Monthly'}>{t('addedit_billing_monthly') || 'Monthly'}</Option>
+                          <Option value={t('addedit_billing_quarterly') || 'Quarterly'}>{t('addedit_billing_quarterly') || 'Quarterly'}</Option>
+                          <Option value={t('addedit_billing_yearly') || 'Yearly'}>{t('addedit_billing_yearly') || 'Yearly'}</Option>
                         </Dropdown>
-                        <Label htmlFor="sub-date" className={styles.catStyle}>Next Billing Date</Label>
+                        <Label htmlFor="sub-date" className={styles.catStyle}>{t('addedit_next_billing_date') || 'Next Billing Date'}</Label>
                         <Input
                           id="sub-date"
                           type="date"
@@ -370,33 +371,40 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                           required
                           className={styles["themed-date-input"]}
                         />
-                        <Label htmlFor="sub-category" className={styles.catStyle}>Category</Label>
+                        <Label htmlFor="sub-category" className={styles.catStyle}>{t('addedit_category') || 'Category'}</Label>
                         <Dropdown
                           id="sub-category"
                           value={category}
-                          placeholder="Select category"
+                          placeholder={t('addedit_category') || 'Select category'}
                           onOptionSelect={(_event: unknown, data: DropdownOnChangeData) => {
                             if (data.optionValue) {
                               setCategory(data.optionValue);
                             }
                           }}
                         >
-                          {CATEGORIES.map(c => (
-                            <Option key={c.key} value={c.text}>{c.text}</Option>
-                          ))}
+                          <Option value={t('addedit_category_entertainment') || 'Entertainment'}>{t('addedit_category_entertainment') || 'Entertainment'}</Option>
+                          <Option value={t('addedit_category_shopping') || 'Shopping'}>{t('addedit_category_shopping') || 'Shopping'}</Option>
+                          <Option value={t('addedit_category_education') || 'Education'}>{t('addedit_category_education') || 'Education'}</Option>
+                          <Option value={t('addedit_category_finance') || 'Finance'}>{t('addedit_category_finance') || 'Finance'}</Option>
+                          <Option value={t('addedit_category_music') || 'Music'}>{t('addedit_category_music') || 'Music'}</Option>
+                          <Option value={t('addedit_category_utilities') || 'Utilities'}>{t('addedit_category_utilities') || 'Utilities'}</Option>
+                          <Option value={t('addedit_category_streaming') || 'Streaming'}>{t('addedit_category_streaming') || 'Streaming'}</Option>
+                          <Option value={t('addedit_category_software') || 'Software'}>{t('addedit_category_software') || 'Software'}</Option>
+                          <Option value={t('addedit_category_insurance') || 'Insurance'}>{t('addedit_category_insurance') || 'Insurance'}</Option>
+                          <Option value={t('addedit_category_other') || 'Other'}>{t('addedit_category_other') || 'Other'}</Option>
                         </Dropdown>
                       </div>
                       <div className={styles["addedit-form-col"]}>
-                        <Label htmlFor="sub-description">Description</Label>
+                        <Label htmlFor="sub-description">{t('addedit_description') || 'Description'}</Label>
                         <Input id="sub-description" className={styles.labelStyles} value={description} onChange={e => setDescription((e.target as HTMLInputElement).value)} />
-                        <Label htmlFor="sub-logo">Logo URL</Label>
+                        <Label htmlFor="sub-logo">{t('addedit_logo_url') || 'Logo URL'}</Label>
                         <Input id="sub-logo" className={styles.labelStyles} value={logo} onChange={e => setLogo((e.target as HTMLInputElement).value)} />
-                        <Label htmlFor="sub-website">Website</Label>
+                        <Label htmlFor="sub-website">{t('addedit_website') || 'Website'}</Label>
                         <Input id="sub-website" className={styles.labelStyles} value={website} onChange={e => setWebsite((e.target as HTMLInputElement).value)} />
-                        <Label htmlFor="sub-notes">Notes</Label>
+                        <Label htmlFor="sub-notes">{t('addedit_notes') || 'Notes'}</Label>
                         <Input id="sub-notes" className={styles.labelStyles} value={notes} onChange={e => setNotes((e.target as HTMLInputElement).value)} />
                         <Label htmlFor="sub-color" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span>Color</span>
+                          <span>{t('addedit_color') || 'Color'}</span>
                           <ColorRegular style={{ marginLeft: 4, fontSize: 20 }} />
                         </Label>
                         <div className={styles.colorSelector}>
@@ -410,10 +418,10 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                         </div>
                       </div>
                       <div className={styles["addedit-form-actions"]}>
-                        {error && <Text style={{ color: 'var(--fluent-colorPaletteRedForeground1, red)' }}>{error}</Text>}
-                        <Button className={styles["cancel-btn"]} appearance="subtle" type="button" onClick={() => navigate('/subscriptions')}>Cancel</Button>
+                        {error && <Text style={{ color: 'var(--fluent-colorPaletteRedForeground1, red)' }}>{t('addedit_error_save') || error}</Text>}
+                        <Button className={styles["cancel-btn"]} appearance="subtle" type="button" onClick={() => navigate('/subscriptions')}>{t('addedit_cancel') || 'Cancel'}</Button>
                         <Button appearance="primary" type="submit" disabled={loading}>
-                          {loading ? <Spinner size="tiny" /> : isEdit ? <><SaveRegular style={{ marginRight: 6 }} />Save</> : <><AddFilled style={{ marginRight: 6 }} />Add</>}
+                          {loading ? <Spinner size="tiny" /> : isEdit ? <><SaveRegular style={{ marginRight: 6 }} />{t('addedit_save') || 'Save'}</> : <><AddFilled style={{ marginRight: 6 }} />{t('addedit_add') || 'Add'}</>}
                         </Button>
                       </div>
                     </form>

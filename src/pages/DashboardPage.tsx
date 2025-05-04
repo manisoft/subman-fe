@@ -1,24 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { parseISO, isAfter, isBefore, addDays, format, isValid, compareAsc, startOfDay, parse, isEqual } from 'date-fns';
 import { motion } from 'framer-motion';
 import { tokens } from '@fluentui/react-components';
-import { 
-  Button, 
-  Card, 
-  CardHeader, 
-  Text, 
-  Spinner, 
-  Title3, 
-  makeStyles 
+import {
+  Button,
+  Card,
+  CardHeader,
+  Text,
+  Spinner,
+  Title3,
+  makeStyles
 } from '@fluentui/react-components';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import styles from './DashboardPage.module.css';
-import { Dismiss24Regular, CalendarLtr24Regular, Wallet24Regular, Cart24Regular, MoneyHand24Regular, ErrorCircleRegular } from '@fluentui/react-icons';
+import { CalendarLtr24Regular, Wallet24Regular, Cart24Regular, MoneyHand24Regular, ErrorCircleRegular } from '@fluentui/react-icons';
 import { getSubscriptions, apiRequest } from '../api';
 import { subscribeUserToPush, unsubscribeUserFromPush } from '../pushNotifications';
 import { useNavigate } from 'react-router-dom';
 import { addMonths, addYears, addWeeks } from 'date-fns';
+import { LanguageContext } from '../App';
 
 // Define Subscription interface
 interface Subscription {
@@ -42,14 +43,14 @@ const getTextColorForBackground = (bgColor: string): string => {
   try {
     // Basic luminance check for hex colors (assumes #RRGGBB format)
     const color = effectiveBgColor.startsWith('#') ? effectiveBgColor.substring(1) : '808080'; // Default to gray if not hex
-    const rgb = parseInt(color, 16);   
-    const r = (rgb >> 16) & 0xff;  
-    const g = (rgb >> 8) & 0xff;  
-    const b = (rgb >> 0) & 0xff;   
-    const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; 
+    const rgb = parseInt(color, 16);
+    const r = (rgb >> 16) & 0xff;
+    const g = (rgb >> 8) & 0xff;
+    const b = (rgb >> 0) & 0xff;
+    const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
 
     // Use static white for dark backgrounds, primary foreground (theme-aware) for light backgrounds
-    return luma < 128 ? tokens.colorNeutralForeground1Static : tokens.colorNeutralForeground1; 
+    return luma < 128 ? tokens.colorNeutralForeground1Static : tokens.colorNeutralForeground1;
   } catch (e) {
     // Fallback if color parsing fails (e.g., not a valid hex)
     return tokens.colorNeutralForeground1; // Default to standard text color
@@ -120,8 +121,9 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
   const [success, setSuccess] = useState('');
   const [page, setPage] = useState(0);
 
-  const [confirmDelete, setConfirmDelete] = useState<string|null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { t } = useContext(LanguageContext);
 
   useEffect(() => {
     setLoading(true);
@@ -166,12 +168,14 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
             <div>
-              <Text size={800} weight="bold" as="h1">Welcome back, {user?.name || user?.email || 'User'}!</Text>
-              <div><Text size={400} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>Here's an overview of your subscription spending</Text></div>
+              <Text size={800} weight="bold" as="h1">
+                {(t('dashboard_welcome') || 'Welcome back, {name}!').replace('{name}', user?.name || user?.email || 'User')}
+              </Text>
+              <div><Text size={400} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{t('dashboard_overview') || "Here's an overview of your subscription spending"}</Text></div>
             </div>
             <Button appearance="primary" onClick={handleAdd} style={{ minWidth: 180, fontWeight: 600 }}>
-  {subs.length === 0 ? 'Add your first subscription' : 'Add Subscription'}
-</Button>
+              {subs.length === 0 ? t('dashboard_add_first') || 'Add your first subscription' : t('dashboard_add') || 'Add Subscription'}
+            </Button>
           </div>
         </motion.div>
 
@@ -185,32 +189,32 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
         >
           {loading
             ? Array.from({ length: 4 }).map((_, idx) => (
-                <div key={idx} className={styles.skeleton} style={{ height: 120, borderRadius: 16 }} />
-              ))
+              <div key={idx} className={styles.skeleton} style={{ height: 120, borderRadius: 16 }} />
+            ))
             : ([
-                {
-                  icon: <Wallet24Regular className={styles.cardIcon} />, label: 'Monthly Spending',
-                  value: `$${subs.reduce((sum: number, s: Subscription) => {
-                    const price = Number(s.price);
-                    switch ((s.billing_cycle || '').toLowerCase().replace(/[-\s]/g, '')) {
-                      case 'monthly': return sum + price;
-                      case 'yearly': return sum + price / 12;
-                      case 'weekly': return sum + price * 52 / 12;
-                      case 'biweekly': return sum + price * 26 / 12;
-                      case 'quarterly': return sum + price * 4 / 12;
-                      default: return sum;
-                    }
-                  }, 0).toFixed(2)}`,
-                  sub: `${subs.length} active subscriptions`
-                },
-                {
-                  icon: <MoneyHand24Regular className={styles.cardIcon} />, label: 'Yearly Spending',
-                  value: `$${subs.reduce((sum: number, s: Subscription) => sum + (s.billing_cycle === 'yearly' ? Number(s.price) : Number(s.price)*12), 0).toFixed(2)}`,
-                  sub: 'Projected annual cost'
-                },
-                {
-                  icon: <CalendarLtr24Regular className={styles.cardIcon} />, label: 'Next Payment',
-                  value: (() => {
+              {
+                icon: <Wallet24Regular className={styles.cardIcon} />, label: t('dashboard_monthly_spending') || 'Monthly Spending',
+                value: `$${subs.reduce((sum: number, s: Subscription) => {
+                  const price = Number(s.price);
+                  switch ((s.billing_cycle || '').toLowerCase().replace(/[-\s]/g, '')) {
+                    case 'monthly': return sum + price;
+                    case 'yearly': return sum + price / 12;
+                    case 'weekly': return sum + price * 52 / 12;
+                    case 'biweekly': return sum + price * 26 / 12;
+                    case 'quarterly': return sum + price * 4 / 12;
+                    default: return sum;
+                  }
+                }, 0).toFixed(2)}`,
+                sub: `${subs.length} ${t('dashboard_active_subs') || 'active subscriptions'}`
+              },
+              {
+                icon: <MoneyHand24Regular className={styles.cardIcon} />, label: t('dashboard_yearly_spending') || 'Yearly Spending',
+                value: `$${subs.reduce((sum: number, s: Subscription) => sum + (s.billing_cycle === 'yearly' ? Number(s.price) : Number(s.price) * 12), 0).toFixed(2)}`,
+                sub: t('dashboard_projected_annual') || 'Projected annual cost'
+              },
+              {
+                icon: <CalendarLtr24Regular className={styles.cardIcon} />, label: t('dashboard_next_payment') || 'Next Payment',
+                value: (() => {
                   if (!subs.length) return 'No upcoming';
                   const today = startOfDay(new Date());
                   // Filter to only those today or after
@@ -222,53 +226,53 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                   if (!upcoming.length) return 'No upcoming';
                   // Find the soonest
                   const nextSub = upcoming.reduce((next: Subscription | null, s: Subscription) => {
-                  if (!next || !next.next_billing_date) return s;
-                  if (!s.next_billing_date || !next.next_billing_date) return next;
-                  const d = getCurrentNextBillingDate(s.next_billing_date, s.billing_cycle, today);
-                  const dn = getCurrentNextBillingDate(next.next_billing_date, next.billing_cycle, today);
-                  if (d === null || dn === null) return next;
-                  return isBefore(d, dn) ? s : next;
-                }, null);
+                    if (!next || !next.next_billing_date) return s;
+                    if (!s.next_billing_date || !next.next_billing_date) return next;
+                    const d = getCurrentNextBillingDate(s.next_billing_date, s.billing_cycle, today);
+                    const dn = getCurrentNextBillingDate(next.next_billing_date, next.billing_cycle, today);
+                    if (d === null || dn === null) return next;
+                    return isBefore(d, dn) ? s : next;
+                  }, null);
                   return nextSub && nextSub.next_billing_date
-    ? formatFriendlyDate(getCurrentNextBillingDate(nextSub.next_billing_date, nextSub.billing_cycle, today)?.toISOString().slice(0, 10) || null)
-    : 'No upcoming';
+                    ? formatFriendlyDate(getCurrentNextBillingDate(nextSub.next_billing_date, nextSub.billing_cycle, today)?.toISOString().slice(0, 10) || null)
+                    : 'No upcoming';
                 })(),
-                  sub: (() => {
-                    if (!subs.length) return 'No payments due soon';
-                    const nextSub = subs.reduce((next: Subscription | null, s: Subscription) => {
-                      if (!s.next_billing_date) return next;
-                      if (!next || !next.next_billing_date || new Date(s.next_billing_date) < new Date(next.next_billing_date)) return s;
-                      return next;
-                    }, null);
-                    return nextSub ? `${subs.filter(s => s.next_billing_date === nextSub.next_billing_date).length} upcoming` : 'No payments due soon';
-                  })()
-                },
-                {
-                  icon: <Cart24Regular className={styles.cardIcon} />, label: 'Average Per Service',
-                  value: `$${subs.length > 0 ? (subs.reduce((sum: number, s: Subscription) => sum + Number(s.price), 0) / subs.length).toFixed(2) : '0.00'}`,
-                  sub: 'Monthly average per subscription'
-                }
-              ] as Array<{icon: React.ReactNode; label: string; value: React.ReactNode; sub: React.ReactNode}>).map((card, idx) => (
-                <motion.div key={card.label}
-                  whileHover={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
-                  whileFocus={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
-                  transition={{ type: 'spring', stiffness: 240, damping: 22, mass: 0.9 }}
-                  style={{ borderRadius: '0.5rem', overflow: 'visible' }}
-                >
-                  <Card className={`${styles.fluentCard} shadow-sm fluent-card fluent-reveal-effect`}>
-                    <div className={styles.cardHeader} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <h3 style={{ margin: 0, fontWeight: 500, fontSize: '0.95rem', letterSpacing: 0, lineHeight: 1.3, color: 'var(--fluent-colorNeutralForeground1)' }}>{card.label}</h3>
-                      <span style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fluent-colorNeutralForeground3, #888)' }}>
-                        {React.cloneElement(card.icon as React.ReactElement, { style: { fontSize: 20, color: 'inherit', background: 'none', padding: 0, margin: 0 } })}
-                      </span>
-                    </div>
-                    <div className={styles.cardContent}>
-                      <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--fluent-colorNeutralForeground1)' }}>{card.value}</div>
-                      <p style={{ fontSize: '0.85rem', margin: '0.25rem 0 0 0', color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{card.sub}</p>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
+                sub: (() => {
+                  if (!subs.length) return t('dashboard_no_payments_due') || 'No payments due soon';
+                  const nextSub = subs.reduce((next: Subscription | null, s: Subscription) => {
+                    if (!s.next_billing_date) return next;
+                    if (!next || !next.next_billing_date || new Date(s.next_billing_date) < new Date(next.next_billing_date)) return s;
+                    return next;
+                  }, null);
+                  return nextSub ? `${subs.filter(s => s.next_billing_date === nextSub.next_billing_date).length} ${t('dashboard_upcoming') || 'upcoming'}` : t('dashboard_no_payments_due') || 'No payments due soon';
+                })()
+              },
+              {
+                icon: <Cart24Regular className={styles.cardIcon} />, label: t('dashboard_avg_per_service') || 'Average Per Service',
+                value: `$${subs.length > 0 ? (subs.reduce((sum: number, s: Subscription) => sum + Number(s.price), 0) / subs.length).toFixed(2) : '0.00'}`,
+                sub: t('dashboard_monthly_avg') || 'Monthly average per subscription'
+              }
+            ] as Array<{ icon: React.ReactNode; label: string; value: React.ReactNode; sub: React.ReactNode }>).map((card, idx) => (
+              <motion.div key={card.label}
+                whileHover={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
+                whileFocus={{ boxShadow: '0 4px 16px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.05)' }}
+                transition={{ type: 'spring', stiffness: 240, damping: 22, mass: 0.9 }}
+                style={{ borderRadius: '0.5rem', overflow: 'visible' }}
+              >
+                <Card className={`${styles.fluentCard} shadow-sm fluent-card fluent-reveal-effect`}>
+                  <div className={styles.cardHeader} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <h3 style={{ margin: 0, fontWeight: 500, fontSize: '0.95rem', letterSpacing: 0, lineHeight: 1.3, color: 'var(--fluent-colorNeutralForeground1)' }}>{card.label}</h3>
+                    <span style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fluent-colorNeutralForeground3, #888)' }}>
+                      {React.cloneElement(card.icon as React.ReactElement, { style: { fontSize: 20, color: 'inherit', background: 'none', padding: 0, margin: 0 } })}
+                    </span>
+                  </div>
+                  <div className={styles.cardContent}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--fluent-colorNeutralForeground1)' }}>{card.value}</div>
+                    <p style={{ fontSize: '0.85rem', margin: '0.25rem 0 0 0', color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{card.sub}</p>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
         </motion.div>
 
         {/* 2-column grid: Upcoming Payments and Spending by Category */}
@@ -289,62 +293,62 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
             >
               <Card className={`${styles.fluentCard} shadow-sm fluent-card fluent-reveal-effect`}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalXS }}>
-                  <Text size={600} weight="semibold">Upcoming Payments</Text>
-                  <Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>Your subscription payments due in the next 30 days</Text>
+                  <Text size={600} weight="semibold">{t('dashboard_upcoming_payments') || 'Upcoming Payments'}</Text>
+                  <Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{t('dashboard_payments_due_30') || 'Your subscription payments due in the next 30 days'}</Text>
                 </div>
                 <div style={{ padding: tokens.spacingVerticalXL, textAlign: 'center' }}>
                   {loading ? (
-  <div className={styles.skeleton} style={{ height: 96, borderRadius: 12, margin: '0 auto' }} />
-) : (
-  subs.length === 0 ? (
-    <>
-      <div><CalendarLtr24Regular style={{ width: 48, height: 48, color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }} /></div>
-      <div><Text weight="semibold" size={400} style={{ marginBottom: 16 }}>No subscriptions yet</Text></div>
-      <div><Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }}>You have not added any subscriptions to your account.</Text></div>
-      <div><Button appearance="primary" style={{ marginTop: 20 }} onClick={handleAdd}>Add your first subscription</Button></div>
-    </>
-  ) : (() => {
-    // Use date-fns for robust, timezone-safe filtering and sorting
-    const today = startOfDay(new Date());
-    const in30Days = addDays(today, 30);
-    const isSameOrAfter = (dateA: Date, dateB: Date) => isAfter(dateA, dateB) || isEqual(dateA, dateB);
-    const isSameOrBefore = (dateA: Date, dateB: Date) => isBefore(dateA, dateB) || isEqual(dateA, dateB);
-    const upcoming = subs
-      .map(s => {
-        if (!s.next_billing_date) return null;
-        const d = getCurrentNextBillingDate(s.next_billing_date, s.billing_cycle, today);
-        if (d && isValid(d) && isSameOrAfter(d, today) && isSameOrBefore(d, in30Days)) {
-          return { ...s, _computedNextBillingDate: d };
-        }
-        return null;
-      })
-      .filter((s): s is Subscription & { _computedNextBillingDate: Date } => s !== null)
-      .sort((a, b) => compareAsc(a._computedNextBillingDate, b._computedNextBillingDate));
-    if (upcoming.length === 0) {
-      return (
-        <>
-          <div><CalendarLtr24Regular style={{ width: 48, height: 48, color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }} /></div>
-          <div><Text weight="semibold" size={400}>No upcoming payments</Text></div>
-          <div><Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: '8px 0' }}>You don't have any payments due in the next 30 days</Text></div>
-        </>
-      );
-    }
-    return upcoming.map(s => (
-      <div key={s.id} style={{ marginBottom: tokens.spacingVerticalXS }}>
-        <Text weight="semibold">{s.name}</Text>
-        <Text size={300} style={{ marginLeft: tokens.spacingHorizontalS }}>{formatFriendlyDate(s._computedNextBillingDate.toISOString().slice(0, 10))}</Text>
-      </div>
-    ));
-  })()
-)}
+                    <div className={styles.skeleton} style={{ height: 96, borderRadius: 12, margin: '0 auto' }} />
+                  ) : (
+                    subs.length === 0 ? (
+                      <>
+                        <div><CalendarLtr24Regular style={{ width: 48, height: 48, color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }} /></div>
+                        <div><Text weight="semibold" size={400} style={{ marginBottom: 16 }}>{t('dashboard_no_subs') || 'No subscriptions yet'}</Text></div>
+                        <div><Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }}>{t('dashboard_no_subs_desc') || 'You have not added any subscriptions to your account.'}</Text></div>
+                        <div><Button appearance="primary" style={{ marginTop: 20 }} onClick={handleAdd}>{t('dashboard_add_first') || 'Add your first subscription'}</Button></div>
+                      </>
+                    ) : (() => {
+                      // Use date-fns for robust, timezone-safe filtering and sorting
+                      const today = startOfDay(new Date());
+                      const in30Days = addDays(today, 30);
+                      const isSameOrAfter = (dateA: Date, dateB: Date) => isAfter(dateA, dateB) || isEqual(dateA, dateB);
+                      const isSameOrBefore = (dateA: Date, dateB: Date) => isBefore(dateA, dateB) || isEqual(dateA, dateB);
+                      const upcoming = subs
+                        .map(s => {
+                          if (!s.next_billing_date) return null;
+                          const d = getCurrentNextBillingDate(s.next_billing_date, s.billing_cycle, today);
+                          if (d && isValid(d) && isSameOrAfter(d, today) && isSameOrBefore(d, in30Days)) {
+                            return { ...s, _computedNextBillingDate: d };
+                          }
+                          return null;
+                        })
+                        .filter((s): s is Subscription & { _computedNextBillingDate: Date } => s !== null)
+                        .sort((a, b) => compareAsc(a._computedNextBillingDate, b._computedNextBillingDate));
+                      if (upcoming.length === 0) {
+                        return (
+                          <>
+                            <div><CalendarLtr24Regular style={{ width: 48, height: 48, color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }} /></div>
+                            <div><Text weight="semibold" size={400}>{t('dashboard_no_upcoming') || 'No upcoming payments'}</Text></div>
+                            <div><Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: '8px 0' }}>{t('dashboard_no_upcoming_desc') || "You don't have any payments due in the next 30 days"}</Text></div>
+                          </>
+                        );
+                      }
+                      return upcoming.map(s => (
+                        <div key={s.id} style={{ marginBottom: tokens.spacingVerticalXS }}>
+                          <Text weight="semibold">{s.name}</Text>
+                          <Text size={300} style={{ marginLeft: tokens.spacingHorizontalS }}>{formatFriendlyDate(s._computedNextBillingDate.toISOString().slice(0, 10))}</Text>
+                        </div>
+                      ));
+                    })()
+                  )}
                 </div>
                 {subs.length > 0 && (
-  <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0 0 0' }}>
-    <Button appearance="secondary" onClick={() => navigate('/subscriptions')}>
-      View all subscriptions
-    </Button>
-  </div>
-)}
+                  <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0 0 0' }}>
+                    <Button appearance="secondary" onClick={() => navigate('/subscriptions')}>
+                      {t('dashboard_view_all') || 'View all subscriptions'}
+                    </Button>
+                  </div>
+                )}
               </Card>
             </motion.div>
           </div>
@@ -359,10 +363,10 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
             >
               <Card className={`${styles.fluentCard} shadow-sm fluent-card fluent-reveal-effect`}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalXS }}>
-                  <Text size={600} weight="semibold">Spending by Category</Text>
-                  <Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>How your subscriptions are distributed</Text>
+                  <Text size={600} weight="semibold">{t('dashboard_spending_by_cat') || 'Spending by Category'}</Text>
+                  <Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{t('dashboard_spending_dist') || 'How your subscriptions are distributed'}</Text>
                 </div>
-                 <div style={{ padding: tokens.spacingVerticalXL, textAlign: 'center' }}>
+                <div style={{ padding: tokens.spacingVerticalXL, textAlign: 'center' }}>
                   {loading ? (
                     <div className={styles.skeleton} style={{ height: 96, borderRadius: 12 }} />
                   ) : (
@@ -374,9 +378,9 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                         return (
                           <>
                             <div><ErrorCircleRegular style={{ width: 48, height: 48, color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }} /></div>
-                            <div><Text weight="semibold" size={400} style={{ marginBottom: 16 }}>No categories found</Text></div>
-                            <div><Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }}>Add categories to your subscriptions to see spending distribution</Text></div>
-                            <div><Button appearance="secondary" style={{ marginTop: 20 }} onClick={() => navigate('/subscriptions')}>Manage subscription</Button></div>
+                            <div><Text weight="semibold" size={400} style={{ marginBottom: 16 }}>{t('dashboard_no_cat') || 'No categories found'}</Text></div>
+                            <div><Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', marginBottom: 16 }}>{t('dashboard_no_cat_desc') || 'Add categories to your subscriptions to see spending distribution'}</Text></div>
+                            <div><Button appearance="secondary" style={{ marginTop: 20 }} onClick={() => navigate('/subscriptions')}>{t('dashboard_manage_subs') || 'Manage subscription'}</Button></div>
                           </>
                         );
                       }
@@ -404,7 +408,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                                 <div style={{ textAlign: 'right' }}>
                                   <Text weight="bold">${total.toFixed(2)}</Text>
                                   <div>
-                                    <Text size={100} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{count} subscription{count !== 1 ? 's' : ''}</Text>
+                                    <Text size={100} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{count} {t('dashboard_subs') || 'subscription'}{count !== 1 ? 's' : ''}</Text>
                                   </div>
                                 </div>
                               </div>
@@ -423,15 +427,16 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
       {/* Delete Confirmation Modal */}
       {confirmDelete && (
         <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: tokens.colorNeutralShadowAmbient, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: tokens.colorNeutralShadowAmbient, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
           <div style={{ background: tokens.colorNeutralBackground1, padding: tokens.spacingHorizontalXXL, borderRadius: tokens.borderRadiusXLarge, boxShadow: tokens.shadow16, minWidth: 320 }}>
-            <Text size={500} weight="semibold">Delete this subscription?</Text>
+            <Text size={500} weight="semibold">{t('dashboard_delete_title') || 'Delete this subscription?'}</Text>
             <div style={{ margin: `${tokens.spacingVerticalXL} 0` }}>
-              <Text>Are you sure you want to delete this subscription? This action cannot be undone.</Text>
+              <Text>{t('dashboard_delete_desc') || 'Are you sure you want to delete this subscription? This action cannot be undone.'}</Text>
             </div>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
-              <Button appearance="subtle" onClick={() => setConfirmDelete(null)}>Cancel</Button>
-              <Button appearance="primary" onClick={() => handleDelete(confirmDelete!)}>Delete</Button>
+              <Button appearance="subtle" onClick={() => setConfirmDelete(null)}>{t('dashboard_cancel') || 'Cancel'}</Button>
+              <Button appearance="primary" onClick={() => handleDelete(confirmDelete!)}>{t('dashboard_delete') || 'Delete'}</Button>
             </div>
           </div>
         </div>

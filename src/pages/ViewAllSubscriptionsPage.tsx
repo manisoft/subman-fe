@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Card, Text, Button, Input, Spinner, tokens } from '@fluentui/react-components';
 import { ColorLineRegular, DeleteRegular, DeleteDismissRegular } from '@fluentui/react-icons';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { getSubscriptions, apiRequest } from '../api';
 import { updateSubscriptionsInServiceWorker } from '../utils/swSubscriptions';
 import { Dialog, DialogTrigger, DialogSurface, DialogBody, DialogTitle, DialogActions } from '@fluentui/react-components';
 import { motion } from 'framer-motion';
+import { LanguageContext } from '../App';
 
 // Helper function to format date strings
 const formatFriendlyDate = (dateString: string | null | undefined): string => {
@@ -61,6 +62,7 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const navigate = useNavigate();
+  const { t } = useContext(LanguageContext);
 
   useEffect(() => {
     setLoading(true);
@@ -115,14 +117,14 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
       <Header user={user} />
       <main className={styles.dashboardContainer}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: tokens.spacingVerticalXL }}>
-          <Text size={800} weight="bold">Subscriptions</Text>
-          <Button appearance="primary" onClick={handleAdd} style={{ minWidth: 180, fontWeight: 600 }}>Add Subscription</Button>
+          <Text size={800} weight="bold">{t('viewall_title') || 'Subscriptions'}</Text>
+          <Button appearance="primary" onClick={handleAdd} style={{ minWidth: 180, fontWeight: 600 }}>{t('viewall_add') || 'Add Subscription'}</Button>
         </div>
         <div style={{ marginBottom: tokens.spacingVerticalM }}>
           <Input
             value={search}
             onChange={e => setSearch((e.target as HTMLInputElement).value)}
-            placeholder="Search subscriptions..."
+            placeholder={t('viewall_search_placeholder') || 'Search subscriptions...'}
             style={{ width: '100%' }}
           />
         </div>
@@ -173,7 +175,7 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
                         )}
                         <div>
                           <h3 style={{ fontWeight: 600, fontSize: 20, margin: 0 }}>{sub.name}</h3>
-                          <p style={{ fontSize: 14, color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{toTitleCase(sub.category || 'Uncategorized')}</p>
+                          <p style={{ fontSize: 14, color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{toTitleCase(sub.category || t('addedit_category_other') || 'Uncategorized')}</p>
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: 4 }}>
@@ -185,20 +187,20 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
                   <div style={{ padding: 24, paddingTop: 0 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 14 }}>
                       <div>
-                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Price</p>
+                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{t('viewall_price') || 'Price'}</p>
                         <p style={{ fontWeight: 500, margin: 0 }}>${Number(sub.price).toFixed(2)}</p>
                       </div>
                       <div>
-                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Billing Cycle</p>
+                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{t('viewall_billing_cycle') || 'Billing Cycle'}</p>
                         <p style={{ fontWeight: 500, margin: 0, textTransform: 'capitalize' }}>{sub.billing_cycle}</p>
                       </div>
                       <div>
-                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Next Payment</p>
-                        <p style={{ fontWeight: 500, margin: 0 }}>{sub.next_billing_date ? formatFriendlyDate(sub.next_billing_date) : 'N/A'}</p>
+                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{t('viewall_next_payment') || 'Next Payment'}</p>
+                        <p style={{ fontWeight: 500, margin: 0 }}>{sub.next_billing_date ? formatFriendlyDate(sub.next_billing_date) : t('viewall_na') || 'N/A'}</p>
                       </div>
                       <div>
-                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>Added On</p>
-                        <p style={{ fontWeight: 500, margin: 0 }}>{sub.created_at ? formatFriendlyDate(sub.created_at) : 'N/A'}</p>
+                        <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{t('viewall_added_on') || 'Added On'}</p>
+                        <p style={{ fontWeight: 500, margin: 0 }}>{sub.created_at ? formatFriendlyDate(sub.created_at) : t('viewall_na') || 'N/A'}</p>
                       </div>
                     </div>
                   </div>
@@ -210,7 +212,7 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
         {/* Pagination */}
         {totalPages > 1 && (
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: tokens.spacingVerticalXL }}>
-            <Button disabled={page === 1} onClick={() => setPage(page - 1)} style={{ marginRight: 8 }}>Previous</Button>
+            <Button disabled={page === 1} onClick={() => setPage(page - 1)} style={{ marginRight: 8 }}>{t('viewall_previous') || 'Previous'}</Button>
             {[...Array(totalPages)].map((_, idx) => (
               <Button
                 key={idx}
@@ -221,7 +223,7 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
                 {idx + 1}
               </Button>
             ))}
-            <Button disabled={page === totalPages} onClick={() => setPage(page + 1)} style={{ marginLeft: 8 }}>Next</Button>
+            <Button disabled={page === totalPages} onClick={() => setPage(page + 1)} style={{ marginLeft: 8 }}>{t('viewall_next') || 'Next'}</Button>
           </div>
         )}
 
@@ -233,13 +235,17 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
         <DialogSurface className="delete-dialog-surface">
           <DialogBody>
             <DialogTitle as="h2" action={<DeleteDismissRegular style={{ color: 'red', fontSize: 24 }} />}>
-              Delete Subscription
+              {t('viewall_delete_title') || 'Delete Subscription'}
             </DialogTitle>
             <div style={{ margin: '20px 0', fontSize: 16 }}>
-              This will permanently delete the subscription <b>"{subs.find(s => s.id === confirmDeleteId)?.name || ''}"</b>. This action cannot be undone.
+              {(t('viewall_delete_desc') || 'This will permanently delete the subscription {name}. This action cannot be undone.').split('{name}').map((part, idx, arr) =>
+                idx < arr.length - 1
+                  ? <React.Fragment key={idx}>{part}<b>{subs.find(s => s.id === confirmDeleteId)?.name || ''}</b></React.Fragment>
+                  : part
+              )}
             </div>
             <DialogActions>
-              <Button appearance="secondary" onClick={handleDeleteCancel}>Cancel</Button>
+              <Button appearance="secondary" onClick={handleDeleteCancel}>{t('viewall_cancel') || 'Cancel'}</Button>
               <Button
                 appearance="primary"
                 icon={<DeleteDismissRegular style={{ color: 'white' }} />}
@@ -248,7 +254,7 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
                 disabled={deleteLoading}
               >
                 {deleteLoading ? <Spinner size="tiny" style={{ marginRight: 8, verticalAlign: 'middle' }} /> : null}
-                Delete
+                {t('viewall_delete') || 'Delete'}
               </Button>
             </DialogActions>
           </DialogBody>

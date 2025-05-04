@@ -6,6 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import { FluentProvider, webLightTheme, webDarkTheme } from '@fluentui/react-components';
 import { registerPeriodicSync } from './utils/registerPeriodicSync';
+import { LanguageProvider } from './App';
 
 function getSystemTheme() {
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -60,7 +61,9 @@ function Root() {
 
   return (
     <FluentProvider theme={colorMode === 'dark' ? webDarkTheme : webLightTheme}>
-      <App colorMode={colorMode} setColorMode={handleSetColorMode} />
+      <LanguageProvider>
+        <App colorMode={colorMode} setColorMode={handleSetColorMode} />
+      </LanguageProvider>
     </FluentProvider>
   );
 }
