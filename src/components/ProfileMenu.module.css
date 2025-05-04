@@ -107,7 +107,7 @@
 
 .profileMenuDropdownItem:focus,
 .profileMenuDropdownItem:hover {
-    background-color: #f3f4f6;
+    background-color: #a7a7a766;
     color: #111;
 }
 
@@ -130,7 +130,7 @@
 
 .profileMenuDropdownDark {
     background-color: #23272f;
-    color: #f3f4f6;
+    color: #6c6c6c;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.30), 0 1px 4px rgba(0, 0, 0, 0.10);
 }
 
@@ -140,13 +140,7 @@
 }
 
 .profileMenuDropdownDark .profileMenuDropdownItem {
-    color: #f3f4f6;
-}
-
-.profileMenuDropdownDark .profileMenuDropdownItem:focus,
-.profileMenuDropdownDark .profileMenuDropdownItem:hover {
-    background-color: #2d323c;
-    color: #fff;
+    color: #8c8c8c;
 }
 
 .profileMenuDropdownDark .profileMenuDestructive {
