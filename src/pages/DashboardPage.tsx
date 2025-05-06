@@ -20,6 +20,7 @@ import { subscribeUserToPush, unsubscribeUserFromPush } from '../pushNotificatio
 import { useNavigate } from 'react-router-dom';
 import { addMonths, addYears, addWeeks } from 'date-fns';
 import { LanguageContext } from '../App';
+import { convertPrice, formatPrice } from '../utils/currency';
 
 // Define Subscription interface
 interface Subscription {
@@ -125,6 +126,14 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
 
+  const userCurrency = localStorage.getItem('currency') || 'USD';
+  const rates = JSON.parse(localStorage.getItem('currencyRates') || '{}');
+
+  const displayPrice = (price: number, originalCurrency: string) => {
+    const converted = convertPrice(Number(price), originalCurrency, userCurrency, rates);
+    return formatPrice(converted, userCurrency);
+  };
+
   useEffect(() => {
     setLoading(true);
     getSubscriptions(token)
@@ -194,7 +203,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
             : ([
               {
                 icon: <Wallet24Regular className={styles.cardIcon} />, label: t('dashboard_monthly_spending') || 'Monthly Spending',
-                value: `$${subs.reduce((sum: number, s: Subscription) => {
+                value: displayPrice(subs.reduce((sum: number, s: Subscription) => {
                   const price = Number(s.price);
                   switch ((s.billing_cycle || '').toLowerCase().replace(/[-\s]/g, '')) {
                     case 'monthly': return sum + price;
@@ -204,12 +213,12 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                     case 'quarterly': return sum + price * 4 / 12;
                     default: return sum;
                   }
-                }, 0).toFixed(2)}`,
+                }, 0), 'USD'),
                 sub: `${subs.length} ${t('dashboard_active_subs') || 'active subscriptions'}`
               },
               {
                 icon: <MoneyHand24Regular className={styles.cardIcon} />, label: t('dashboard_yearly_spending') || 'Yearly Spending',
-                value: `$${subs.reduce((sum: number, s: Subscription) => sum + (s.billing_cycle === 'yearly' ? Number(s.price) : Number(s.price) * 12), 0).toFixed(2)}`,
+                value: displayPrice(subs.reduce((sum: number, s: Subscription) => sum + (s.billing_cycle === 'yearly' ? Number(s.price) : Number(s.price) * 12), 0), 'USD'),
                 sub: t('dashboard_projected_annual') || 'Projected annual cost'
               },
               {
@@ -249,7 +258,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
               },
               {
                 icon: <Cart24Regular className={styles.cardIcon} />, label: t('dashboard_avg_per_service') || 'Average Per Service',
-                value: `$${subs.length > 0 ? (subs.reduce((sum: number, s: Subscription) => sum + Number(s.price), 0) / subs.length).toFixed(2) : '0.00'}`,
+                value: displayPrice(subs.length > 0 ? (subs.reduce((sum: number, s: Subscription) => sum + Number(s.price), 0) / subs.length) : 0, 'USD'),
                 sub: t('dashboard_monthly_avg') || 'Monthly average per subscription'
               }
             ] as Array<{ icon: React.ReactNode; label: string; value: React.ReactNode; sub: React.ReactNode }>).map((card, idx) => (
@@ -406,7 +415,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                                   <Text weight="medium">{cat}</Text>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                  <Text weight="bold">${total.toFixed(2)}</Text>
+                                  <Text weight="bold">{displayPrice(total, 'USD')}</Text>
                                   <div>
                                     <Text size={100} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{count} {t('dashboard_subs') || 'subscription'}{count !== 1 ? 's' : ''}</Text>
                                   </div>

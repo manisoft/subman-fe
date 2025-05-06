@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styles from './AddEditSubscriptionPage.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Input, Label, Text, Spinner, Dropdown, Option } from '@fluentui/react-components';
+import { Button, Input, Label, Text, Spinner, Dropdown, Option, Combobox } from '@fluentui/react-components';
 import { ColorRegular, SaveRegular, AddFilled, Search24Regular } from '@fluentui/react-icons';
 
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
@@ -9,6 +9,7 @@ import { apiRequest } from '../api';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { LanguageContext } from '../App';
+import currencies from '../currencies.json';
 
 type DropdownOnChangeData = { optionValue?: string }; // Best practice for Fluent UI v9
 
@@ -88,6 +89,8 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
   const [popularPage, setPopularPage] = useState(1);
   const POPULAR_PAGE_SIZE = 20;
   const [popularSearch, setPopularSearch] = useState('');
+  // Currency state: default to user's selected currency or USD
+  const [currency, setCurrency] = useState(() => localStorage.getItem('currency') || 'USD');
 
   // Auto-switch to 'custom' tab if prefill data is present and not editing
   useEffect(() => {
@@ -139,6 +142,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
             website?: string;
             notes?: string;
             color?: string;
+            currency?: string;
           };
           setName(sub.name || '');
           setPrice(sub.price ? String(sub.price) : '');
@@ -158,6 +162,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
           setWebsite(sub.website || '');
           setNotes(sub.notes || '');
           setColor(sub.color || '#e5e7eb');
+          setCurrency(sub.currency || localStorage.getItem('currency') || 'USD');
         })
         .catch(e => setError(e.message || 'Failed to load subscription'))
         .finally(() => setLoading(false));
@@ -204,6 +209,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
         website,
         notes,
         color,
+        currency,
       };
       if (isEdit) {
         await apiRequest(`/subscriptions/${id}`, 'PUT', payload, token);
@@ -403,18 +409,40 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                         <Input id="sub-website" className={styles.labelStyles} value={website} onChange={e => setWebsite((e.target as HTMLInputElement).value)} />
                         <Label htmlFor="sub-notes">{t('addedit_notes') || 'Notes'}</Label>
                         <Input id="sub-notes" className={styles.labelStyles} value={notes} onChange={e => setNotes((e.target as HTMLInputElement).value)} />
-                        <Label htmlFor="sub-color" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <span>{t('addedit_color') || 'Color'}</span>
-                          <ColorRegular style={{ marginLeft: 4, fontSize: 20 }} />
-                        </Label>
-                        <div className={styles.colorSelector}>
-                          <input
-                            type="color"
-                            id="sub-color"
-                            value={color}
-                            onChange={e => setColor(e.target.value)}
-                            style={{ width: 48, height: 32, border: 'none', background: 'none', padding: 0, cursor: 'pointer' }}
-                          />
+
+                        {/* Currency and Color Row */}
+                        <div className={styles.currencyColorRow}>
+                          <div className={styles.currencyCol}>
+                            <Label htmlFor="sub-currency">{t('currency') || 'Currency'}</Label>
+                            <Combobox
+                              id="sub-currency"
+                              value={currency}
+                              onOptionSelect={(_e, d) => setCurrency(d.optionValue as string)}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrency(e.target.value.toUpperCase())}
+                              className={styles.ComboboxStyles}
+                              listbox={{ style: { maxHeight: '50vh', overflowY: 'auto' } }}
+                              freeform
+                            >
+                              {Object.entries(currencies).map(([code, name]) => (
+                                <Option key={code} value={code} text={`${code} - ${name}`}>{code} - {name}</Option>
+                              ))}
+                            </Combobox>
+                          </div>
+                          <div className={styles.colorCol}>
+                            <Label htmlFor="sub-color" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span>{t('addedit_color') || 'Color'}</span>
+                              <ColorRegular style={{ marginLeft: 4, fontSize: 20 }} />
+                            </Label>
+                            <div className={styles.colorSelector}>
+                              <input
+                                type="color"
+                                id="sub-color"
+                                value={color}
+                                onChange={e => setColor(e.target.value)}
+                                style={{ width: 48, height: 32, border: 'none', background: 'none', padding: 0, cursor: 'pointer', marginTop: 2 }}
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                       <div className={styles["addedit-form-actions"]}>

@@ -10,6 +10,7 @@ import { updateSubscriptionsInServiceWorker } from '../utils/swSubscriptions';
 import { Dialog, DialogTrigger, DialogSurface, DialogBody, DialogTitle, DialogActions } from '@fluentui/react-components';
 import { motion } from 'framer-motion';
 import { LanguageContext } from '../App';
+import { convertPrice, formatPrice } from '../utils/currency';
 
 // Helper function to format date strings
 const formatFriendlyDate = (dateString: string | null | undefined): string => {
@@ -49,6 +50,7 @@ interface Subscription {
   color?: string | null;
   notes?: string | null;
   created_at?: string | null;
+  currency?: string | null; // <-- Add currency property
 }
 
 const PAGE_SIZE = 15;
@@ -63,6 +65,14 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
   const [deleteLoading, setDeleteLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
+  const rates = JSON.parse(localStorage.getItem('currencyRates') || '{}');
+  const userCurrency = localStorage.getItem('currency') || 'USD';
+
+  const displayPrice = (price: string | number, originalCurrency: string) => {
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+    const converted = convertPrice(numPrice, originalCurrency, userCurrency, rates);
+    return formatPrice(converted, userCurrency);
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -188,7 +198,7 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 14 }}>
                       <div>
                         <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{t('viewall_price') || 'Price'}</p>
-                        <p style={{ fontWeight: 500, margin: 0 }}>${Number(sub.price).toFixed(2)}</p>
+                        <p style={{ fontWeight: 500, margin: 0 }}>{displayPrice(sub.price, sub.currency || 'USD')}</p>
                       </div>
                       <div>
                         <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{t('viewall_billing_cycle') || 'Billing Cycle'}</p>

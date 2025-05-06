@@ -9,7 +9,7 @@
   margin: 0 auto;
   padding: 48px 32px 24px 32px;
   min-height: 80vh;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   border-radius: 1.2rem;
   box-sizing: border-box;
   transition: background 0.3s;
@@ -23,11 +23,12 @@
   padding: 0 1rem 0 1rem;
 }
 
-.colorSelector{
+.colorSelector {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 3.5rem;
+  margin-top: 2.5px;
 }
 
 .cancel-btn {
@@ -41,9 +42,11 @@
     max-width: 100vw;
     display: flex;
   }
+
   .cancel-btn {
     margin-right: 0px !important;
   }
+
   .addedit-card {
     min-width: 0;
     width: 100vw;
@@ -51,6 +54,7 @@
     box-sizing: border-box;
     padding: 1.2rem 0.5rem 1.2rem 0.5rem;
   }
+
   .addedit-form {
     display: flex;
     flex-direction: column !important;
@@ -58,16 +62,19 @@
     width: 100%;
     box-sizing: border-box;
   }
+
   .addedit-form-col {
     width: 100%;
     box-sizing: border-box;
     gap: .3rem;
   }
+
   .tab-content {
     padding: 18px 0.5rem 12px 0.5rem;
     width: 100%;
     box-sizing: border-box;
   }
+
   .addeditCardPopular {
     display: flex;
     flex-direction: column;
@@ -75,20 +82,38 @@
     min-height: 160px;
     padding: 0;
   }
+
   .addedit-form-actions {
     position: absolute;
     display: contents;
-    width:100%;
+    width: 100%;
     bottom: 1.2rem;
     gap: 1.2rem;
     padding-top: 1.2rem;
     padding-bottom: 0.5rem;
   }
-  .colorSelector{
+
+  .colorSelector {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 2rem;
+  }
+
+  .currencyColorRow {
+    flex-direction: column !important;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .currencyCol,
+  .colorCol {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .ComboboxStyles {
+    width: 100%;
   }
 }
 
@@ -104,27 +129,33 @@
   .addedit-container {
     padding: 18px 2vw 8px 2vw;
   }
+
   .addedit-card {
     padding: 0.7rem 0.2rem 1rem 0.2rem;
   }
+
   .tab-content {
     padding: 8px 0.2rem 8px 0.2rem;
   }
+
   .tab-switcher {
     flex-direction: row !important;
     gap: 8px;
     justify-content: space-between;
   }
+
   .popular {
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 16px !important;
   }
+
   .addedit-footer-fixed {
     position: static !important;
     box-shadow: none !important;
     background: none !important;
   }
+
   .addedit-form,
   .addedit-form-col {
     width: 100%;
@@ -133,6 +164,7 @@
     display: flex;
     flex-direction: column !important;
   }
+
   .addedit-form-col input,
   .addedit-form-col .ms-TextField,
   .addedit-form-col .ms-Dropdown,
@@ -147,9 +179,9 @@
   }
 
 
-.addedit-form-col input::placeholder {
-  color: var(--fluent-colorNeutralForeground3, #888);
-}
+  .addedit-form-col input::placeholder {
+    color: var(--fluent-colorNeutralForeground3, #888);
+  }
 
 }
 
@@ -162,14 +194,14 @@
   border: none;
   color: var(--fluent-colorNeutralForeground3, #888);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
 }
 
 .tab-btn.active {
   background: var(--fluent-colorBrandBackground2, #3972ec);
   color: var(--fluent-colorBrandForeground1, #ffffff);
-  box-shadow: 0 2px 8px rgba(0,95,184,0.08);
+  box-shadow: 0 2px 8px rgba(0, 95, 184, 0.08);
 }
 
 .tab-content {
@@ -178,7 +210,7 @@
   box-shadow: none;
   padding: 0px;
   min-height: 400px;
-  transition: background 0.4s cubic-bezier(.4,0,.2,1);
+  transition: background 0.4s cubic-bezier(.4, 0, .2, 1);
   margin-bottom: 24px;
   width: 100%;
 }
@@ -187,7 +219,7 @@
 .addedit-card {
   border-radius: 0.5rem;
   color: var(--fluent-colorNeutralForeground1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1.5px 6px rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s, transform 0.3s, background 0.3s, color 0.3s;
   padding: 1.5rem;
   display: flex;
@@ -196,8 +228,9 @@
   position: relative;
 }
 
-.addedit-card:hover, .addedit-card:focus {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.10);
+.addedit-card:hover,
+.addedit-card:focus {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.13), 0 2px 8px rgba(0, 0, 0, 0.10);
   transform: translateY(-.5px);
 }
 
@@ -238,7 +271,7 @@
   bottom: 0;
   z-index: 100;
   background: var(--fluent-colorNeutralBackground1);
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* Theme-aware native date picker icon */
@@ -254,3 +287,24 @@
   margin-top: 1.6rem;
 }
 
+.currencyColorRow {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+}
+
+.currencyCol {
+  display: flex;
+  flex-direction: column;
+  row-gap: .3rem;
+  width: 350px;
+}
+
+.colorCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.ComboboxStyles {
+  width: 100%;
+}

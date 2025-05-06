@@ -14,22 +14,40 @@
   .settingsContainer {
     padding: 24px 6vw 12px 6vw;
   }
+
   .settingsCard {
     padding: 0.7rem 0.5rem 1.1rem 0.5rem;
     margin-bottom: 18px;
   }
+
   .settingsSectionHeader {
     font-size: 1.15rem;
   }
+
   .settingsSectionDesc {
     font-size: 0.89rem;
     margin-bottom: 10px;
   }
+
   .settingsRowLabel {
     font-size: 0.95rem;
   }
-  .settingsInfoLabel, .settingsInfoText {
+
+  .settingsInfoLabel,
+  .settingsInfoText {
     font-size: 0.89rem;
+  }
+
+  .currencyColorRow {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .currencyCol,
+  .colorCol {
+    min-width: 0;
+    width: 100%;
   }
 }
 
@@ -37,22 +55,23 @@
   .settingsContainer {
     padding: 12px 2vw 6px 2vw;
   }
+
   .settingsCard {
     padding: 0.5rem 0.25rem 0.7rem 0.25rem;
   }
 }
 
-
 .settingsCard {
   border-radius: 0.5rem;
   background: var(--fluent-colorNeutralBackground1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 1.5px 6px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1.5px 6px rgba(0, 0, 0, 0.04);
   margin-bottom: 32px;
   transition: box-shadow 0.2s, transform 0.3s;
 }
 
-.settingsCard:hover, .settingsCard:focus {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.10);
+.settingsCard:hover,
+.settingsCard:focus {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.13), 0 2px 8px rgba(0, 0, 0, 0.10);
   transform: translateY(-.5px);
 }
 
@@ -92,4 +111,37 @@
 .settingsInfoText {
   font-size: 0.95rem;
   color: var(--fluent-colorNeutralForeground3, #888);
+}
+
+.currencyColorRow {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  align-items: flex-end;
+}
+
+.currencyCol {
+  flex: 1 1 0;
+  min-width: 180px;
+}
+
+.colorCol {
+  flex: 0 0 auto;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+@media (max-width: 600px) {
+  .currencyColorRow {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .colorCol {
+    align-items: flex-start;
+    min-width: 0;
+  }
 }

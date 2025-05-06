@@ -7,6 +7,8 @@ import { WeatherSunnyRegular, WeatherMoonRegular, AlertRegular } from '@fluentui
 import styles from './SettingsPage.module.css';
 import { useVersion } from '../hooks/useVersion';
 import { LanguageContext } from '../App';
+import currencies from '../currencies.json';
+import { apiRequest } from '../api';
 
 interface SettingsPageProps {
   user: any;
@@ -17,12 +19,59 @@ interface SettingsPageProps {
   onPushToggle: () => void;
 }
 
+// Utility to detect default currency from browser locale
+function getDefaultCurrency() {
+  // Try to use browser's resolved currency
+  try {
+    const currency = Intl.NumberFormat().resolvedOptions().currency;
+    if (currency && (currencies as Record<string, string>)[currency]) return currency;
+  } catch { }
+  // Fallback: map language/region to currency
+  const locale = navigator.language || 'en-US';
+  const region = locale.split('-')[1];
+  // Simple region->currency mapping (expand as needed)
+  const regionCurrencyMap: Record<string, string> = {
+    'US': 'USD', 'CA': 'CAD', 'GB': 'GBP', 'FR': 'EUR', 'DE': 'EUR', 'JP': 'JPY', 'CN': 'CNY', 'IN': 'INR', 'AU': 'AUD', 'RU': 'RUB', 'BR': 'BRL', 'MX': 'MXN', 'ZA': 'ZAR', 'KR': 'KRW', 'TR': 'TRY', 'IR': 'IRR', 'SA': 'SAR', 'AE': 'AED', 'CH': 'CHF', 'SE': 'SEK', 'NO': 'NOK', 'DK': 'DKK', 'PL': 'PLN', 'CZ': 'CZK', 'HU': 'HUF', 'SG': 'SGD', 'HK': 'HKD', 'NZ': 'NZD', 'TH': 'THB', 'ID': 'IDR', 'MY': 'MYR', 'PH': 'PHP', 'PK': 'PKR', 'EG': 'EGP', 'NG': 'NGN', 'KE': 'KES', 'AR': 'ARS', 'CO': 'COP', 'CL': 'CLP', 'PE': 'PEN', 'VE': 'VES', 'UA': 'UAH', 'RO': 'RON', 'BG': 'BGN', 'IL': 'ILS', 'IQ': 'IQD', 'JO': 'JOD', 'LB': 'LBP', 'OM': 'OMR', 'QA': 'QAR', 'KW': 'KWD', 'BH': 'BHD', 'DZ': 'DZD', 'MA': 'MAD', 'TN': 'TND', 'SD': 'SDG', 'LY': 'LYD', 'GH': 'GHS', 'TZ': 'TZS', 'UG': 'UGX', 'ZM': 'ZMW', 'ZW': 'ZWL', 'BD': 'BDT', 'LK': 'LKR', 'NP': 'NPR', 'MM': 'MMK', 'KH': 'KHR', 'VN': 'VND', 'LA': 'LAK', 'MN': 'MNT', 'UZ': 'UZS', 'KZ': 'KZT', 'KG': 'KGS', 'TJ': 'TJS', 'TM': 'TMT', 'AF': 'AFN', 'AZ': 'AZN', 'AM': 'AMD', 'GE': 'GEL', 'MD': 'MDL', 'BY': 'BYN', 'EE': 'EUR', 'LT': 'EUR', 'LV': 'EUR', 'SK': 'EUR', 'SI': 'EUR', 'HR': 'EUR', 'RS': 'RSD', 'ME': 'EUR', 'MK': 'MKD', 'AL': 'ALL', 'BA': 'BAM', 'XK': 'EUR', 'IS': 'ISK', 'FI': 'EUR', 'IE': 'EUR', 'PT': 'EUR', 'ES': 'EUR', 'IT': 'EUR', 'GR': 'EUR', 'NL': 'EUR', 'BE': 'EUR', 'LU': 'EUR', 'AT': 'EUR', 'MT': 'EUR', 'CY': 'EUR', 'SM': 'EUR', 'VA': 'EUR', 'AD': 'EUR', 'LI': 'CHF', 'GI': 'GIP', 'GG': 'GGP', 'JE': 'JEP', 'IM': 'IMP', 'FO': 'DKK', 'GL': 'DKK', 'SJ': 'NOK', 'AX': 'EUR', 'PM': 'EUR', 'WF': 'XPF', 'PF': 'XPF', 'NC': 'XPF', 'TF': 'EUR', 'YT': 'EUR', 'RE': 'EUR', 'MQ': 'EUR', 'GP': 'EUR', 'BL': 'EUR', 'MF': 'EUR', 'SX': 'ANG', 'CW': 'ANG', 'BQ': 'USD', 'AW': 'AWG', 'SR': 'SRD', 'GF': 'EUR', 'FK': 'FKP', 'GS': 'GBP', 'SH': 'SHP', 'IO': 'USD', 'VG': 'USD', 'KY': 'KYD', 'BM': 'BMD', 'MS': 'XCD', 'AI': 'XCD', 'AG': 'XCD', 'DM': 'XCD', 'LC': 'XCD', 'VC': 'XCD', 'KN': 'XCD', 'TC': 'USD', 'BS': 'BSD', 'BB': 'BBD', 'GD': 'XCD', 'TT': 'TTD', 'JM': 'JMD', 'BZ': 'BZD', 'GT': 'GTQ', 'SV': 'USD', 'HN': 'HNL', 'NI': 'NIO', 'CR': 'CRC', 'PA': 'PAB', 'DO': 'DOP', 'CU': 'CUP', 'HT': 'HTG'
+  };
+  if (region && regionCurrencyMap[region]) return regionCurrencyMap[region];
+  return 'USD';
+}
+
 export default function SettingsPage({ user, colorMode, setColorMode, pushEnabled, pushLoading, onPushToggle }: SettingsPageProps) {
   // Check browser notification permission
   const [permission, setPermission] = React.useState(Notification.permission);
   const prevPermission = React.useRef(permission);
   const { version, loading, error, releaseDate } = useVersion();
   const { language, setLanguage, t } = useContext(LanguageContext);
+
+  // Currency state and persistence
+  const [currency, setCurrency] = React.useState('USD');
+  const [currenciesList, setCurrenciesList] = React.useState<{ code: string; name: string }[]>([]);
+  const [loadingCurrency, setLoadingCurrency] = React.useState(true);
+
+  React.useEffect(() => {
+    async function fetchCurrencyData() {
+      setLoadingCurrency(true);
+      try {
+        const token = localStorage.getItem('token') || undefined;
+        const [userRes, allRes] = await Promise.all([
+          apiRequest<{ currency: string }>('/user/currency', 'GET', undefined, token),
+          apiRequest<{ code: string; name: string }[]>('/user/currencies', 'GET'),
+        ]);
+        setCurrency(userRes.currency || getDefaultCurrency());
+        setCurrenciesList(allRes.map((c) => ({ code: c.code, name: c.name })));
+      } finally {
+        setLoadingCurrency(false);
+      }
+    }
+    fetchCurrencyData();
+  }, []);
+
+  const handleCurrencyChange = async (newCurrency: string) => {
+    setCurrency(newCurrency);
+    const token = localStorage.getItem('token') || undefined;
+    await apiRequest('/user/currency', 'PUT', { currency: newCurrency }, token);
+  };
 
   React.useEffect(() => {
     setPermission(Notification.permission);
@@ -32,6 +81,10 @@ export default function SettingsPage({ user, colorMode, setColorMode, pushEnable
   React.useEffect(() => {
     prevPermission.current = permission;
   }, [permission]);
+
+  React.useEffect(() => {
+    localStorage.setItem('currency', currency);
+  }, [currency]);
 
   return (
     <div className={styles.pageRoot}>
@@ -113,28 +166,28 @@ export default function SettingsPage({ user, colorMode, setColorMode, pushEnable
               </div>
             </div>
 
-            {/* App Information Section */}
+            {/* Currency Section */}
             <div className={styles.settingsCard}>
               <div style={{ padding: 24 }}>
-                <h3 className={styles.settingsSectionHeader}>{t('app_information') || 'App Information'}</h3>
-                <p className={styles.settingsSectionDesc}>{t('app_information_desc') || 'Details about your SubMan installation'}</p>
+                <h3 className={styles.settingsSectionHeader}>{t('currency') || 'Currency'}</h3>
+                <p className={styles.settingsSectionDesc}>{t('currency_desc') || 'Select your preferred currency for the app'}</p>
               </div>
               <div style={{ padding: 24, paddingTop: 0 }}>
-                <div style={{ marginBottom: 20 }}>
-                  <div className={styles.settingsInfoLabel}>{t('version') || 'Version'}</div>
-                  <div className={styles.settingsInfoText}>{version || (loading ? 'Loading...' : error ? 'Error' : '')}</div>
-                </div>
-                <div style={{ marginBottom: 20 }}>
-                  <div className={styles.settingsInfoLabel}>{t('installation_type') || 'Installation Type'}</div>
-                  <div className={styles.settingsInfoText}>{t('installation_type_pwa') || 'Progressive Web App (PWA)'}</div>
-                </div>
-                <div>
-                  <div className={styles.settingsInfoLabel}>{t('last_updated') || 'Last Updated'}</div>
-                  <div className={styles.settingsInfoText}>{releaseDate ? releaseDate.toLocaleDateString() : '2025'}</div>
-                </div>
+                <Dropdown
+                  value={currency}
+                  onOptionSelect={(_e, d) => handleCurrencyChange(d.optionValue as string)}
+                  style={{ width: 220 }}
+                >
+                  {currenciesList.map(({ code, name }) => (
+                    <Option key={code} value={code} text={`${code} - ${name}`}>{code} - {name}</Option>
+                  ))}
+                </Dropdown>
               </div>
             </div>
+
           </div>
+
+          {/* App Information Section */}
         </main>
       </div>
       <Footer />

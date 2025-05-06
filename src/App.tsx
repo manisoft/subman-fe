@@ -19,6 +19,7 @@ import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import AdminPopularServicesPage from './pages/AdminPopularServicesPage';
 import { subscribeUserToPush, unsubscribeUserFromPush } from './pushNotifications';
 import GoogleAnalytics from './GoogleAnalytics';
+import { apiRequest } from './api';
 
 // Add a type for the language data
 interface LanguageStrings {
@@ -80,6 +81,15 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       {children}
     </LanguageContext.Provider>
   );
+}
+
+function fetchAndStoreCurrencyRates() {
+  apiRequest('/user/currencies', 'GET').then((res: any) => {
+    // Assume res is [{code, name, rate_to_usd}]
+    const rates: Record<string, number> = {};
+    res.forEach((c: any) => { rates[c.code] = c.rate_to_usd; });
+    localStorage.setItem('currencyRates', JSON.stringify(rates));
+  });
 }
 
 function App({ colorMode, setColorMode }: AppProps) {
@@ -190,6 +200,10 @@ function App({ colorMode, setColorMode }: AppProps) {
     localStorage.setItem('token', t);
     localStorage.setItem('user', JSON.stringify(u));
   };
+
+  useEffect(() => {
+    fetchAndStoreCurrencyRates();
+  }, []);
 
   return (
     <div className={classes.root}>
