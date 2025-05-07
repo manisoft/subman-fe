@@ -5,11 +5,7 @@ import { tokens } from '@fluentui/react-components';
 import {
   Button,
   Card,
-  CardHeader,
-  Text,
-  Spinner,
-  Title3,
-  makeStyles
+  Text
 } from '@fluentui/react-components';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -204,7 +200,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
               {
                 icon: <Wallet24Regular className={styles.cardIcon} />, label: t('dashboard_monthly_spending') || 'Monthly Spending',
                 value: displayPrice(subs.reduce((sum: number, s: Subscription) => {
-                  const price = Number(s.price);
+                  const price = convertPrice(Number(s.price), (s as any).currency || 'USD', userCurrency, rates);
                   switch ((s.billing_cycle || '').toLowerCase().replace(/[-\s]/g, '')) {
                     case 'monthly': return sum + price;
                     case 'yearly': return sum + price / 12;
@@ -213,12 +209,15 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                     case 'quarterly': return sum + price * 4 / 12;
                     default: return sum;
                   }
-                }, 0), 'USD'),
+                }, 0), userCurrency),
                 sub: `${subs.length} ${t('dashboard_active_subs') || 'active subscriptions'}`
               },
               {
                 icon: <MoneyHand24Regular className={styles.cardIcon} />, label: t('dashboard_yearly_spending') || 'Yearly Spending',
-                value: displayPrice(subs.reduce((sum: number, s: Subscription) => sum + (s.billing_cycle === 'yearly' ? Number(s.price) : Number(s.price) * 12), 0), 'USD'),
+                value: displayPrice(subs.reduce((sum: number, s: Subscription) => {
+                  const price = convertPrice(Number(s.price), (s as any).currency || 'USD', userCurrency, rates);
+                  return sum + (s.billing_cycle === 'yearly' ? price : price * 12);
+                }, 0), userCurrency),
                 sub: t('dashboard_projected_annual') || 'Projected annual cost'
               },
               {
@@ -258,7 +257,9 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
               },
               {
                 icon: <Cart24Regular className={styles.cardIcon} />, label: t('dashboard_avg_per_service') || 'Average Per Service',
-                value: displayPrice(subs.length > 0 ? (subs.reduce((sum: number, s: Subscription) => sum + Number(s.price), 0) / subs.length) : 0, 'USD'),
+                value: displayPrice(subs.length > 0 ? (
+                  subs.reduce((sum: number, s: Subscription) => sum + convertPrice(Number(s.price), (s as any).currency || 'USD', userCurrency, rates), 0) / subs.length
+                ) : 0, userCurrency),
                 sub: t('dashboard_monthly_avg') || 'Monthly average per subscription'
               }
             ] as Array<{ icon: React.ReactNode; label: string; value: React.ReactNode; sub: React.ReactNode }>).map((card, idx) => (
@@ -406,7 +407,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalS }}>
                           {categories.map((cat, idx) => {
                             const color = colorPalette[idx % colorPalette.length];
-                            const total = subs.filter(s => s.category === cat).reduce((sum, s) => sum + Number(s.price), 0);
+                            const total = subs.filter(s => s.category === cat).reduce((sum, s) => sum + convertPrice(Number(s.price), (s as any).currency || 'USD', userCurrency, rates), 0);
                             const count = subs.filter(s => s.category === cat).length;
                             return (
                               <div key={cat} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -415,7 +416,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                                   <Text weight="medium">{cat}</Text>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                  <Text weight="bold">{displayPrice(total, 'USD')}</Text>
+                                  <Text weight="bold">{displayPrice(total, userCurrency)}</Text>
                                   <div>
                                     <Text size={100} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{count} {t('dashboard_subs') || 'subscription'}{count !== 1 ? 's' : ''}</Text>
                                   </div>
