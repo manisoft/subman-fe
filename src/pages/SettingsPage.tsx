@@ -105,12 +105,17 @@ export default function SettingsPage({ user, colorMode, setColorMode, pushEnable
               </div>
               <div style={{ padding: 24, paddingTop: 0 }}>
                 <Dropdown
-                  value={language}
+                  value={t(
+                    language === 'en-US' ? 'language_english' :
+                      language === 'fr-CA' ? 'language_french' :
+                        language === 'es-ES' ? 'language_spanish' : 'language_english') || 'English'}
                   onOptionSelect={(_e, d) => setLanguage(d.optionValue as string)}
                   style={{ width: 220 }}
+                  selectedOptions={[language]}
                 >
-                  <Option value="en-US">{t('language_en_us') || 'English (US)'}</Option>
-                  <Option value="fr-CA">{t('language_fr_ca') || 'Français (Canada)'}</Option>
+                  <Option value="en-US">{t('language_english') || 'English'}</Option>
+                  <Option value="fr-CA">{t('language_french') || 'French'}</Option>
+                  <Option value="es-ES">{t('language_spanish') || 'Spanish'}</Option>
                 </Dropdown>
               </div>
             </div>
