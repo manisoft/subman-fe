@@ -104,7 +104,11 @@ function App({ colorMode, setColorMode }: AppProps) {
   const [pushLoading, setPushLoading] = React.useState(false);
 
   useEffect(() => {
-    setPushEnabled(Notification.permission === 'granted');
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setPushEnabled(Notification.permission === 'granted');
+    } else {
+      setPushEnabled(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -157,6 +161,12 @@ function App({ colorMode, setColorMode }: AppProps) {
         await unsubscribeUserFromPush(token);
         setPushEnabled(false);
       } else {
+        if (typeof window === 'undefined' || !('Notification' in window)) {
+          alert('Push notifications are not supported on this device/browser.');
+          setPushEnabled(false);
+          setPushLoading(false);
+          return;
+        }
         // Request notification permission first
         let permission = Notification.permission;
         if (permission !== "granted") {
@@ -165,6 +175,7 @@ function App({ colorMode, setColorMode }: AppProps) {
         if (permission !== "granted") {
           alert("You must allow notifications in your browser to enable push notifications.");
           setPushEnabled(false);
+          setPushLoading(false);
           return;
         }
         const result = await subscribeUserToPush(token);
