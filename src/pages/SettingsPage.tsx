@@ -9,6 +9,7 @@ import { useVersion } from '../hooks/useVersion';
 import { LanguageContext } from '../App';
 import currencies from '../currencies.json';
 import { apiRequest } from '../api';
+import IosInstallBanner from '../components/IosInstallBanner';
 
 interface SettingsPageProps {
   user: any;
@@ -89,6 +90,7 @@ export default function SettingsPage({ user, colorMode, setColorMode, pushEnable
   return (
     <div className={styles.pageRoot}>
       <Header user={user} />
+      <IosInstallBanner />
       <div className={styles.settingsBg}>
         <main className={styles.settingsContainer}>
           <div style={{ maxWidth: 700, margin: '0 auto' }}>

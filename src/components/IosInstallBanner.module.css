@@ -1,0 +1,41 @@
+.iosBanner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fffbe8;
+    color: #222;
+    border-top: 1px solid #e0e0e0;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+    z-index: 9999;
+    padding: 0;
+    font-size: 1rem;
+}
+
+.iosBannerContent {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.iosBannerClose {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #888;
+    cursor: pointer;
+    padding: 0 8px;
+}
+
+.iosShareIcon {
+    display: inline-block;
+    background: url('data:image/svg+xml;utf8,<svg fill="%23222" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 16v-8m0 0l-4 4m4-4l4 4" stroke="%23222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="12" width="16" height="8" rx="2" fill="none" stroke="%23222" stroke-width="2"/></svg>') no-repeat center center;
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: middle;
+    margin: 0 2px;
+}

@@ -1,3 +1,5 @@
+// eslint-disable-next-line no-restricted-globals
+/* eslint-disable */
 /*
   Custom service worker for SubMan PWA
   - Sends notifications one day before and on the day of a subscription payment
@@ -14,8 +16,7 @@ if (self.workbox) {
   self.workbox.precaching.precacheAndRoute(self.__WB_MANIFEST || []);
 }
 
-const CACHE_NAME = 'subman-cache-v1';
-const SUBS_KEY = 'subman-subs';
+// Remove unused CACHE_NAME and SUBS_KEY
 
 self.addEventListener('install', event => {
   self.skipWaiting();
@@ -35,19 +36,40 @@ self.addEventListener('periodicsync', event => {
 // Listen for messages from app to update subscription data
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'UPDATE_SUBSCRIPTIONS') {
-    self.localStorage.setItem(SUBS_KEY, JSON.stringify(event.data.subscriptions));
+    // Store subscriptions in IndexedDB instead of localStorage
+    saveSubscriptionsToIDB(event.data.subscriptions);
   }
 });
 
+// Save subscriptions to IndexedDB
+function saveSubscriptionsToIDB(subs) {
+  if (!('indexedDB' in self)) return;
+  const req = indexedDB.open('subman-db', 1);
+  req.onupgradeneeded = () => {
+    const db = req.result;
+    if (!db.objectStoreNames.contains('subscriptions')) {
+      db.createObjectStore('subscriptions', { keyPath: 'id' });
+    }
+  };
+  req.onsuccess = () => {
+    const db = req.result;
+    const tx = db.transaction('subscriptions', 'readwrite');
+    const store = tx.objectStore('subscriptions');
+    if (Array.isArray(subs)) {
+      subs.forEach(sub => store.put(sub));
+    }
+    tx.oncomplete = () => db.close();
+  };
+}
+
 async function checkAndNotifyPayments() {
-  // Try to get subscriptions from IndexedDB or localStorage
+  // Only use IndexedDB for subscriptions
   let subs = [];
   try {
     subs = await getSubscriptions();
   } catch (e) {
-    // fallback to localStorage
-    const raw = self.localStorage.getItem(SUBS_KEY);
-    if (raw) subs = JSON.parse(raw);
+    // fallback: no subscriptions
+    subs = [];
   }
   if (!Array.isArray(subs)) return;
 
