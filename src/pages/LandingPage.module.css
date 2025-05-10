@@ -1,0 +1,386 @@
+.landingRoot {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: 'Poppins', 'Inter', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.heroSection {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem 2rem 2rem;
+    background: linear-gradient(120deg, #e0e7ff 0%, #f5f7fa 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.heroContent {
+    flex: 1 1 400px;
+    max-width: 520px;
+    z-index: 2;
+    animation: fadeInLeft 1s;
+}
+
+.headline {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-bottom: 1.2rem;
+    line-height: 1.1;
+    color: #222;
+}
+
+.gradientText {
+    background: linear-gradient(90deg, #3972ec 30%, #7f53ac 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+.subheading {
+    font-size: 1.3rem;
+    color: #444;
+    margin-bottom: 2.2rem;
+    font-weight: 500;
+}
+
+.ctaButtons {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 2.5rem;
+}
+
+.ctaButton {
+    font-size: 1.1rem;
+    padding: 1rem 2.2rem;
+    border-radius: 2rem;
+    font-weight: 700;
+    box-shadow: 0 4px 24px 0 rgba(57, 114, 236, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ctaButton:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 32px 0 rgba(57, 114, 236, 0.16);
+}
+
+.heroImageWrap {
+    flex: 1 1 400px;
+    max-width: 540px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 340px;
+    animation: fadeInRight 1.2s;
+}
+
+.dashboardPreview {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 2.5rem;
+    box-shadow: 0 8px 40px 0 rgba(57, 114, 236, 0.13);
+    z-index: 1;
+    background: #fff;
+    animation: fadeInUp 1.2s;
+}
+
+.animatedIcons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.iconEntertainment,
+.iconMusic,
+.iconFitness,
+.iconFinance,
+.iconCalendar {
+    position: absolute;
+    font-size: 2.2rem;
+    opacity: 0.85;
+    animation: float 3s infinite ease-in-out;
+}
+
+.iconEntertainment {
+    left: 10%;
+    top: 10%;
+    color: #e50914;
+    animation-delay: 0s;
+}
+
+.iconMusic {
+    right: 12%;
+    top: 18%;
+    color: #1db954;
+    animation-delay: 0.5s;
+}
+
+.iconFitness {
+    left: 18%;
+    bottom: 12%;
+    color: #fbbf24;
+    animation-delay: 1s;
+}
+
+.iconFinance {
+    right: 10%;
+    bottom: 10%;
+    color: #3972ec;
+    animation-delay: 1.5s;
+}
+
+.iconCalendar {
+    left: 50%;
+    top: 50%;
+    color: #7f53ac;
+    transform: translate(-50%, -50%);
+    animation-delay: 2s;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-18px) scale(1.08);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.exampleSection {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2.5rem;
+    margin: 3rem 0 2rem 0;
+    align-items: flex-start;
+}
+
+.exampleCard {
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 16px 0 rgba(57, 114, 236, 0.08);
+    padding: 2rem 2.5rem;
+    min-width: 320px;
+    max-width: 370px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    animation: fadeInLeft 1.2s;
+}
+
+.exampleInput {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.1rem;
+    background: #f5f7fa;
+    border-radius: 1rem;
+    padding: 0.7rem 1.2rem;
+    box-shadow: 0 1px 4px 0 rgba(57, 114, 236, 0.04);
+    margin-bottom: 0.5rem;
+}
+
+.exampleIcon {
+    font-size: 1.5rem;
+    color: #3972ec;
+}
+
+.exampleText {
+    flex: 1;
+    font-weight: 500;
+    color: #222;
+}
+
+.exampleCategory {
+    background: #e0e7ff;
+    color: #3972ec;
+    font-size: 0.95rem;
+    border-radius: 0.7rem;
+    padding: 0.2rem 0.8rem;
+    font-weight: 600;
+}
+
+.progressCard {
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 16px 0 rgba(57, 114, 236, 0.08);
+    padding: 2rem 2.5rem;
+    min-width: 220px;
+    max-width: 260px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeInRight 1.2s;
+}
+
+.progressCircleWrap {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 1rem;
+}
+
+.progressCircle {
+    width: 100px;
+    height: 100px;
+    display: block;
+}
+
+.progressValue {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #3972ec;
+}
+
+.progressLabel {
+    font-size: 1.1rem;
+    color: #3972ec;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.testimonialsSection {
+    background: linear-gradient(90deg, #e0e7ff 0%, #f5f7fa 100%);
+    padding: 3rem 1rem 4rem 1rem;
+    margin-top: 2rem;
+    border-radius: 2rem 2rem 0 0;
+    box-shadow: 0 -2px 16px 0 rgba(57, 114, 236, 0.06);
+}
+
+.testimonialsTitle {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3972ec;
+    margin-bottom: 2rem;
+}
+
+.testimonialsGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+}
+
+.testimonialCard {
+    background: #fff;
+    border-radius: 1.2rem;
+    box-shadow: 0 2px 12px 0 rgba(57, 114, 236, 0.07);
+    padding: 1.5rem 2rem;
+    max-width: 320px;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    animation: fadeInUp 1.2s;
+}
+
+.testimonialQuote {
+    font-size: 1.1rem;
+    color: #222;
+    margin-bottom: 0.7rem;
+    font-style: italic;
+}
+
+.testimonialUser {
+    font-size: 0.98rem;
+    color: #3972ec;
+    font-weight: 600;
+}
+
+@media (max-width: 900px) {
+    .heroSection {
+        flex-direction: column;
+        padding: 2.5rem 1rem 1.5rem 1rem;
+    }
+
+    .heroContent,
+    .heroImageWrap {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .dashboardPreview {
+        max-width: 95vw;
+    }
+
+    .exampleSection {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: center;
+    }
+}
+
+@media (max-width: 600px) {
+    .headline {
+        font-size: 2rem;
+    }
+
+    .subheading {
+        font-size: 1.05rem;
+    }
+
+    .exampleCard,
+    .progressCard {
+        padding: 1.2rem 1rem;
+        min-width: 0;
+        max-width: 98vw;
+    }
+
+    .testimonialsSection {
+        padding: 2rem 0.2rem 2.5rem 0.2rem;
+        border-radius: 1.2rem 1.2rem 0 0;
+    }
+}

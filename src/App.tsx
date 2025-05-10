@@ -20,6 +20,7 @@ import AdminPopularServicesPage from './pages/AdminPopularServicesPage';
 import { subscribeUserToPush, unsubscribeUserFromPush } from './pushNotifications';
 import GoogleAnalytics from './GoogleAnalytics';
 import { apiRequest } from './api';
+import LandingPage from './pages/LandingPage';
 
 // Add a type for the language data
 interface LanguageStrings {
@@ -210,6 +211,8 @@ function App({ colorMode, setColorMode }: AppProps) {
       <Router>
         <GoogleAnalytics />
         <Routes>
+          {/* Landing page for unauthenticated users */}
+          <Route path="/" element={token ? <Navigate to="/dashboard" /> : <LandingPage />} />
           {/* Unauthenticated routes */}
           <Route path="/terms-of-service" element={<TermsOfServicePage user={user} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage user={user} />} />
