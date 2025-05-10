@@ -116,6 +116,7 @@ export default function SettingsPage({ user, colorMode, setColorMode, pushEnable
                   <Option value="en-US">{t('language_english') || 'English'}</Option>
                   <Option value="fr-CA">{t('language_french') || 'French'}</Option>
                   <Option value="es-ES">{t('language_spanish') || 'Spanish'}</Option>
+                  <Option value="zh-CN">{t('language_chinese') || 'Chinese'}</Option>
                 </Dropdown>
               </div>
             </div>
