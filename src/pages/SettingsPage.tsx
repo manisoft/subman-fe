@@ -50,27 +50,50 @@ export default function SettingsPage({ user, colorMode, setColorMode, pushEnable
   React.useEffect(() => {
     async function fetchCurrencyData() {
       try {
-        const token = localStorage.getItem('token') || undefined;
-        const [userRes, allRes] = await Promise.all([
-          apiRequest<{ currency: string }>('/user/currency', 'GET', undefined, token),
-          apiRequest<{ code: string; name: string }[]>('/user/currencies', 'GET'),
-        ]);
+        let token: string | undefined = undefined;
+        try {
+          token = localStorage.getItem('token') || undefined;
+        } catch { }
+        let userRes: { currency: string } = { currency: getDefaultCurrency() };
+        let allRes: { code: string; name: string }[] = [{ code: 'USD', name: 'US Dollar' }];
+        try {
+          [userRes, allRes] = await Promise.all([
+            apiRequest<{ currency: string }>('/user/currency', 'GET', undefined, token),
+            apiRequest<{ code: string; name: string }[]>('/user/currencies', 'GET'),
+          ]);
+        } catch (e) {
+          // fallback to defaults if API fails
+        }
         setCurrency(userRes.currency || getDefaultCurrency());
         setCurrenciesList(allRes.map((c) => ({ code: c.code, name: c.name })));
-      } finally {
+      } catch (e) {
+        setCurrency(getDefaultCurrency());
+        setCurrenciesList([{ code: 'USD', name: 'US Dollar' }]);
       }
     }
-    fetchCurrencyData();
+    fetchCurrencyData().catch(() => {
+      setCurrency(getDefaultCurrency());
+      setCurrenciesList([{ code: 'USD', name: 'US Dollar' }]);
+    });
   }, []);
 
   const handleCurrencyChange = async (newCurrency: string) => {
     setCurrency(newCurrency);
-    const token = localStorage.getItem('token') || undefined;
-    await apiRequest('/user/currency', 'PUT', { currency: newCurrency }, token);
+    let token: string | undefined = undefined;
+    try {
+      token = localStorage.getItem('token') || undefined;
+    } catch { }
+    try {
+      await apiRequest('/user/currency', 'PUT', { currency: newCurrency }, token);
+    } catch { }
   };
 
   React.useEffect(() => {
-    setPermission(Notification.permission);
+    try {
+      setPermission(Notification.permission);
+    } catch {
+      setPermission('default');
+    }
   }, [pushEnabled]);
 
   // Removed: auto-refresh is now handled in App.tsx
@@ -79,7 +102,9 @@ export default function SettingsPage({ user, colorMode, setColorMode, pushEnable
   }, [permission]);
 
   React.useEffect(() => {
-    localStorage.setItem('currency', currency);
+    try {
+      localStorage.setItem('currency', currency);
+    } catch { }
   }, [currency]);
 
   return (
