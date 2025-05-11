@@ -41,6 +41,28 @@ self.addEventListener('message', event => {
   }
 });
 
+// Listen for push events from backend and show notification
+self.addEventListener('push', function (event) {
+  if (!event.data) return;
+  let data = {};
+  try {
+    data = event.data.json();
+  } catch (e) {
+    // fallback for string payloads
+    data = { title: 'Notification', body: event.data.text() };
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon,
+      badge: data.badge,
+      tag: data.tag,
+      data: data.data,
+      requireInteraction: data.requireInteraction
+    })
+  );
+});
+
 // Save subscriptions to IndexedDB
 function saveSubscriptionsToIDB(subs) {
   if (!('indexedDB' in self)) return;
