@@ -27,6 +27,7 @@ function isInStandaloneMode() {
 
 export default function IosInstallBanner() {
     const [show, setShow] = React.useState(false);
+    const [errored, setErrored] = React.useState(false);
 
     React.useEffect(() => {
         try {
@@ -35,21 +36,26 @@ export default function IosInstallBanner() {
             }
         } catch {
             setShow(false);
+            setErrored(true);
         }
     }, []);
 
-    if (!show) return null;
-
-    return (
-        <div className={styles.iosBanner}>
-            <div className={styles.iosBannerContent}>
-                <span role="img" aria-label="iOS">📱</span>
-                <span>
-                    For the best experience, install SubMan on your iPhone: <br />
-                    Tap <span className={styles.iosShareIcon}></span>"Share", then <b>Add to Home Screen</b>
-                </span>
-                <button className={styles.iosBannerClose} onClick={() => setShow(false)} aria-label="Close">×</button>
+    // Catch any unexpected runtime error in render
+    try {
+        if (errored || !show) return null;
+        return (
+            <div className={styles.iosBanner}>
+                <div className={styles.iosBannerContent}>
+                    <span role="img" aria-label="iOS">📱</span>
+                    <span>
+                        For the best experience, install SubMan on your iPhone: <br />
+                        Tap <span className={styles.iosShareIcon}></span>"Share", then <b>Add to Home Screen</b>
+                    </span>
+                    <button className={styles.iosBannerClose} onClick={() => setShow(false)} aria-label="Close">×</button>
+                </div>
             </div>
-        </div>
-    );
+        );
+    } catch {
+        return null;
+    }
 }
