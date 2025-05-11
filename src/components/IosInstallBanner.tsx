@@ -1,27 +1,40 @@
 import React from 'react';
 import styles from './IosInstallBanner.module.css';
 
-// Utility to detect iOS Safari
+// Utility to detect iOS Safari (safe for all browsers)
 function isIos() {
-    return (
-        /iphone|ipad|ipod/i.test(window.navigator.userAgent) &&
-        /safari/i.test(window.navigator.userAgent) &&
-        !window.navigator.userAgent.match(/crios|fxios|opera|edgios/i)
-    );
+    try {
+        const ua = window?.navigator?.userAgent || '';
+        return (
+            /iphone|ipad|ipod/i.test(ua) &&
+            /safari/i.test(ua) &&
+            !ua.match(/crios|fxios|opera|edgios/i)
+        );
+    } catch {
+        return false;
+    }
 }
 
-// Utility to check if in standalone mode
+// Utility to check if in standalone mode (safe for all browsers)
 function isInStandaloneMode() {
-    // @ts-ignore
-    return window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+    try {
+        // @ts-ignore
+        return (window?.navigator?.standalone === true) || (window?.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    } catch {
+        return false;
+    }
 }
 
 export default function IosInstallBanner() {
     const [show, setShow] = React.useState(false);
 
     React.useEffect(() => {
-        if (isIos() && !isInStandaloneMode()) {
-            setShow(true);
+        try {
+            if (isIos() && !isInStandaloneMode()) {
+                setShow(true);
+            }
+        } catch {
+            setShow(false);
         }
     }, []);
 
