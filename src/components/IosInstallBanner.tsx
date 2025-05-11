@@ -33,7 +33,7 @@ export default function IosInstallBanner() {
                 <span role="img" aria-label="iOS">📱</span>
                 <span>
                     For the best experience, install SubMan on your iPhone: <br />
-                    Tap <span className={styles.iosShareIcon}>Share</span> then <b>Add to Home Screen</b>
+                    Tap <span className={styles.iosShareIcon}></span>"Share", then <b>Add to Home Screen</b>
                 </span>
                 <button className={styles.iosBannerClose} onClick={() => setShow(false)} aria-label="Close">×</button>
             </div>

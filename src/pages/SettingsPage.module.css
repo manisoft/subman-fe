@@ -145,3 +145,39 @@
     min-width: 0;
   }
 }
+
+.pageRoot {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.settingsMainWrapper {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.settingsTitleBlock {
+  margin-bottom: 32px;
+}
+
+.settingsTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.settingsCardHeader {
+  padding: 24px;
+}
+
+.settingsCardBody {
+  padding: 24px;
+  padding-top: 0;
+}
+
+.settingsInfoText {
+  color: var(--fluent-colorNeutralForeground3, #888);
+  font-size: var(--fluent-fontSizeBase200, 1rem);
+  margin-top: var(--fluent-spacingVerticalXS, 8px);
+}
