@@ -53,11 +53,16 @@
     gap: 8px;
 }
 
+.paginationControls {
+    margin-top: 24px;
+    display: flex;
+    gap: 8px;
+}
+
 .adminDashboardRoot {
     display: flex;
     height: 100dvh;
     overflow: hidden;
-    background: var(--fluent-colorNeutralBackground1, #fff);
 }
 
 .adminDashboardMain {

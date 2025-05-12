@@ -5,6 +5,7 @@ const navLinks = [
     { name: 'Dashboard', key: '/admin/dashboard' },
     { name: 'Settings', key: '/admin/settings' },
     { name: 'Pages', key: '/admin/pages' },
+    { name: 'Notifications', key: '/admin/notifications' },
     { name: 'Analytics', key: '/admin/analytics' },
     { name: 'Popular Services', key: '/admin/popular-services' },
 ];
