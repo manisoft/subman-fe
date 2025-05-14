@@ -1,7 +1,7 @@
 import languageDataRaw from './language.json';
-import React, { useEffect, useState, useMemo, createContext } from 'react';
+import React, { useEffect, useState, useMemo, createContext, useContext } from 'react';
 import { makeStyles, shorthands, tokens } from '@fluentui/react-components';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './pages/AuthPage';
 import DashboardPage from './pages/DashboardPage';
 import AddEditSubscriptionPage from './pages/AddEditSubscriptionPage';
@@ -96,6 +96,9 @@ function fetchAndStoreCurrencyRates() {
 
 function App({ colorMode, setColorMode }: AppProps) {
   const classes = useStyles();
+  const { language } = useContext(LanguageContext);
+  // Determine direction based on language
+  const dir = (language === 'ar' || language === 'fa') ? 'rtl' : 'ltr';
   const [token, setToken] = React.useState<string | null>(() => localStorage.getItem('token'));
   const [user, setUser] = React.useState<any>(() => {
     const stored = localStorage.getItem('user');
@@ -219,7 +222,7 @@ function App({ colorMode, setColorMode }: AppProps) {
   }, []);
 
   return (
-    <div className={classes.root}>
+    <div className={classes.root} dir={dir}>
       <Router>
         <GoogleAnalytics />
         <Routes>

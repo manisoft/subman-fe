@@ -130,7 +130,10 @@ export default function SettingsPage({ user, colorMode, setColorMode, pushEnable
                   value={t(
                     language === 'en-US' ? 'language_english' :
                       language === 'fr-CA' ? 'language_french' :
-                        language === 'es-ES' ? 'language_spanish' : 'language_english') || 'English'}
+                        language === 'es-ES' ? 'language_spanish' :
+                          language === 'zh-CN' ? 'language_chinese' :
+                            language === 'ar' ? 'language_arabic' :
+                              language === 'fa' ? 'language_persian' : 'language_english') || 'English'}
                   onOptionSelect={(_e, d) => setLanguage(d.optionValue as string)}
                   style={{ width: 220 }}
                   selectedOptions={[language]}
@@ -139,6 +142,8 @@ export default function SettingsPage({ user, colorMode, setColorMode, pushEnable
                   <Option value="fr-CA">{t('language_french') || 'French'}</Option>
                   <Option value="es-ES">{t('language_spanish') || 'Spanish'}</Option>
                   <Option value="zh-CN">{t('language_chinese') || 'Chinese'}</Option>
+                  <Option value="ar">{t('language_arabic') || 'Arabic'}</Option>
+                  <Option value="fa">{t('language_persian') || 'Persian (Farsi)'}</Option>
                 </Dropdown>
               </div>
             </div>
