@@ -22,6 +22,8 @@ import { subscribeUserToPush, unsubscribeUserFromPush } from './pushNotification
 import GoogleAnalytics from './GoogleAnalytics';
 import { apiRequest } from './api';
 import LandingPage from './pages/LandingPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Add a type for the language data
 interface LanguageStrings {
@@ -233,6 +235,8 @@ function App({ colorMode, setColorMode }: AppProps) {
           <Route path="/privacy-policy" element={<PrivacyPolicyPage user={user} />} />
           <Route path="/about-us" element={<AboutUsPage user={user} />} />
           <Route path="/contact-us" element={<ContactUsPage user={user} />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           {/* Auth flow */}
           <Route path="/auth" element={<AuthPage onAuth={handleAuth} token={token} user={user} />} />

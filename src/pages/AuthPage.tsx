@@ -149,6 +149,16 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
             >
               {mode === 'login' ? 'Sign Up' : 'Sign In'}
             </span>
+            <span style={{ color: 'var(--auth-subtitle-color)', fontSize: tokens.fontSizeBase200 }}>
+              {'  '}
+              Forgot your password?
+            </span>
+            <span>
+              <a href="/forgot-password" className={styles['auth-link']}>
+                {' '}
+                Reset Password
+              </a>
+            </span>
             {/* Agreement text for Terms and Privacy */}
             <div style={{ marginTop: 24, fontSize: tokens.fontSizeBase200, color: 'var(--auth-subtitle-color)' }}>
               {mode === 'register'
