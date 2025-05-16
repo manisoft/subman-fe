@@ -37,7 +37,7 @@ export default function LandingPage() {
                     </div>
                 </div>
                 <div className={styles.heroImageWrap}>
-                    <img src="/landing-dashboard-preview.png" alt="Dashboard Preview" className={styles.dashboardPreview} />
+                    <img src="/landing-dashboard-preview.svg" alt="Dashboard Preview" className={styles.dashboardPreview} />
                     <div className={styles.animatedIcons}>
                         <span className={styles.iconEntertainment}><PlayCircle24Regular /></span>
                         <span className={styles.iconMusic}><MusicNote2PlayRegular /></span>

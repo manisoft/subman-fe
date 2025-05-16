@@ -52,7 +52,7 @@ export default function ResetPasswordPage() {
         <>
             <div className={styles['auth-bg']}>
                 <div className={styles['auth-card']}>
-                    <img src="/logo.png" alt="SubMan Logo" className={styles['auth-logo']} />
+                    <img src="/android/android-launchericon-192-192.png" alt="SubMan Logo" className={styles['auth-logo']} />
                     <div className={styles['auth-title']}>Reset Password</div>
                     <div className={`${styles['auth-subtitle']} ${styles.authSubtitle}`}>
                         Enter your new password below. Password must be at least 6 characters.

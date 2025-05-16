@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
         <>
             <div className={styles['auth-bg']}>
                 <div className={styles['auth-card']}>
-                    <img src="/logo.png" alt="SubMan Logo" className={styles['auth-logo']} />
+                    <img src="/android/android-launchericon-192-192.png" alt="SubMan Logo" className={styles['auth-logo']} />
                     <div className={styles['auth-title']}>Forgot Password</div>
                     <div className={`${styles['auth-subtitle']} ${styles.authSubtitle}`}>
                         Enter your email address and we'll send you a link to reset your password.

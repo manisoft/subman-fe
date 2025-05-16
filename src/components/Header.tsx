@@ -15,7 +15,7 @@ export default function Header({ user }: { user: any }) {
         aria-label="Go to dashboard"
         style={{ cursor: user ? 'pointer' : 'default' }}
       >
-        <img src="/logo.png" alt="SubMan Logo" className={styles.logoImage} />
+        <img src="/android/android-launchericon-192-192.png" alt="SubMan Logo" className={styles.logoImage} />
         <Text size={500} weight="bold" style={{ letterSpacing: 1 }}>SubMan</Text>
       </div>
       {user && <ProfileMenu user={user} />}

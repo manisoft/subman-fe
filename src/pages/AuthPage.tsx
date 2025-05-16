@@ -90,7 +90,7 @@ export default function AuthPage({ onAuth, token, user }: AuthPageProps) {
     <>
       <div className={styles['auth-bg']}>
         <div className={styles['auth-card']}>
-          <img src="/logo.png" alt="SubMan Logo" className={styles['auth-logo']} />
+          <img src="/android/android-launchericon-192-192.png" alt="SubMan Logo" className={styles['auth-logo']} />
           <div className={styles['auth-title']}>
             {mode === 'login' ? 'Sign In' : 'Create Account'}
           </div>
