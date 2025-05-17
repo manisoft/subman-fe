@@ -122,6 +122,18 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
   const handleAdd = () => navigate('/subscription');
   const handleEdit = (id: string) => navigate(`/subscription/${id}`);
 
+  // Map backend billing_cycle keys to translated labels for display
+  function getBillingCycleLabel(key: string, t: (k: string) => string) {
+    switch (key.toLowerCase()) {
+      case 'weekly': return t('addedit_billing_weekly') || 'Weekly';
+      case 'biweekly': return t('addedit_billing_biweekly') || 'Bi-Weekly';
+      case 'monthly': return t('addedit_billing_monthly') || 'Monthly';
+      case 'quarterly': return t('addedit_billing_quarterly') || 'Quarterly';
+      case 'yearly': return t('addedit_billing_yearly') || 'Yearly';
+      default: return key;
+    }
+  }
+
   return (
     <div className={styles.pageRoot}>
       <Header user={user} />
@@ -202,7 +214,7 @@ export default function ViewAllSubscriptionsPage({ token, user }: { token: strin
                       </div>
                       <div>
                         <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{t('viewall_billing_cycle') || 'Billing Cycle'}</p>
-                        <p style={{ fontWeight: 500, margin: 0, textTransform: 'capitalize' }}>{sub.billing_cycle}</p>
+                        <p style={{ fontWeight: 500, margin: 0, textTransform: 'capitalize' }}>{getBillingCycleLabel(sub.billing_cycle, t)}</p>
                       </div>
                       <div>
                         <p style={{ color: 'var(--fluent-colorNeutralForeground3, #888)', margin: 0 }}>{t('viewall_next_payment') || 'Next Payment'}</p>

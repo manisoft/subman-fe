@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styles from './AddEditSubscriptionPage.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Input, Label, Text, Spinner, Dropdown, Option, Combobox } from '@fluentui/react-components';
+import { Button, Input, Label, Text, Spinner, Dropdown, Option, Combobox, Switch } from '@fluentui/react-components';
 import { ColorRegular, SaveRegular, AddFilled, Search24Regular } from '@fluentui/react-icons';
 
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
@@ -18,26 +18,16 @@ interface AddEditSubscriptionPageProps {
   user: any;
 }
 
-const BILLING_CYCLES = [
-  { key: 'weekly', text: 'Weekly' },
-  { key: 'biweekly', text: 'Bi-Weekly' },
-  { key: 'monthly', text: 'Monthly' },
-  { key: 'quarterly', text: 'Quarterly' },
-  { key: 'yearly', text: 'Yearly' },
-];
-
-const CATEGORIES = [
-  { key: 'entertainment', text: 'Entertainment' },
-  { key: 'shopping', text: 'Shopping' },
-  { key: 'education', text: 'Education' },
-  { key: 'finance', text: 'Finance' },
-  { key: 'music', text: 'Music' },
-  { key: 'utilities', text: 'Utilities' },
-  { key: 'streaming', text: 'Streaming' },
-  { key: 'software', text: 'Software' },
-  { key: 'insurance', text: 'Insurance' },
-  { key: 'other', text: 'Other' }
-];
+// Map translated billing cycle labels to backend keys
+function getBillingCycleMap(t: (key: string) => string) {
+  return {
+    [t('addedit_billing_weekly') || 'Weekly']: 'weekly',
+    [t('addedit_billing_biweekly') || 'Bi-Weekly']: 'biweekly',
+    [t('addedit_billing_monthly') || 'Monthly']: 'monthly',
+    [t('addedit_billing_quarterly') || 'Quarterly']: 'quarterly',
+    [t('addedit_billing_yearly') || 'Yearly']: 'yearly',
+  };
+}
 
 export default function AddEditSubscriptionPage({ token, user }: AddEditSubscriptionPageProps) {
   return (
@@ -75,9 +65,8 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
   const [popularError, setPopularError] = useState('');
   const [name, setName] = useState(state?.name || '');
   const [price, setPrice] = useState('');
-  const [billingCycle, setBillingCycle] = useState('Monthly');
-  const [category, setCategory] = useState(state?.category || 'Other');
-  const [categories, setCategories] = useState<{ key: string; text: string }[]>(CATEGORIES);
+  const [billingCycle, setBillingCycle] = useState(t('addedit_billing_monthly') || 'Monthly');
+  const [category, setCategory] = useState(state?.category || t('addedit_category_other') || 'Other');
   const [nextBillingDate, setNextBillingDate] = useState('');
   const [description, setDescription] = useState('');
   const [logo, setLogo] = useState(state?.logo || '');
@@ -91,6 +80,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
   const [popularSearch, setPopularSearch] = useState('');
   // Currency state: default to user's selected currency or USD
   const [currency, setCurrency] = useState(() => localStorage.getItem('currency') || 'USD');
+  const [autoRenew, setAutoRenew] = useState(false);
 
   // Auto-switch to 'custom' tab if prefill data is present and not editing
   useEffect(() => {
@@ -143,11 +133,12 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
             notes?: string;
             color?: string;
             currency?: string;
+            auto_renew?: number | boolean;
           };
           setName(sub.name || '');
           setPrice(sub.price ? String(sub.price) : '');
-          setBillingCycle(sub.billing_cycle || 'Monthly');
-          setCategory(sub.category || 'Other');
+          setBillingCycle(sub.billing_cycle || t('addedit_billing_monthly') || 'Monthly');
+          setCategory(sub.category || t('addedit_category_other') || 'Other');
           // Ensure nextBillingDate is in 'YYYY-MM-DD' format for input[type=date]
           let dateValue = '';
           if (sub.next_billing_date) {
@@ -163,6 +154,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
           setNotes(sub.notes || '');
           setColor(sub.color || '#e5e7eb');
           setCurrency(sub.currency || localStorage.getItem('currency') || 'USD');
+          setAutoRenew(!!sub.auto_renew);
         })
         .catch(e => setError(e.message || 'Failed to load subscription'))
         .finally(() => setLoading(false));
@@ -180,7 +172,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
         .catch(e => setPopularError(e.message))
         .finally(() => setLoadingPopular(false));
     }
-  }, [tab, token]);
+  }, [tab, token, loadingPopular, popularServices.length]);
 
   // Filter and paginate popular services
   const filteredPopularServices = popularServices.filter(service => {
@@ -198,10 +190,12 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
     setError('');
     setLoading(true);
     try {
+      const billingCycleMap = getBillingCycleMap(t);
+      const backendBillingCycle = billingCycleMap[billingCycle] || 'monthly';
       const payload = {
         name,
         price: price ? parseFloat(price) : 0,
-        billing_cycle: billingCycle,
+        billing_cycle: backendBillingCycle,
         category,
         next_billing_date: nextBillingDate,
         description,
@@ -210,6 +204,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
         notes,
         color,
         currency,
+        auto_renew: autoRenew ? 1 : 0,
       };
       if (isEdit) {
         await apiRequest(`/subscriptions/${id}`, 'PUT', payload, token);
@@ -233,8 +228,6 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
               type="button"
               className={`${styles["tab-btn"]} ${tab === 'popular' ? styles["active"] : ''}`}
               onClick={() => setTab('popular')}
-              aria-selected={tab === 'popular'}
-              style={{ outline: 'none' }}
             >
               {t('addedit_popular_services') || 'Popular Services'}
             </button>
@@ -242,13 +235,11 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
               type="button"
               className={`${styles['tab-btn']} ${tab === 'custom' ? styles['active'] : ''}`}
               onClick={() => setTab('custom')}
-              aria-selected={tab === 'custom'}
-              style={{ outline: 'none' }}
             >
               {t('addedit_custom_subscription') || 'Custom Subscription'}
             </button>
           </div>
-          <div style={{ minHeight: 420 }}>
+          <div className={styles["tab-content-minheight"]}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={tab}
@@ -260,19 +251,19 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
               >
                 {tab === 'popular' ? (
                   <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+                    <div className={styles.popularSearchRow}>
                       <Input
                         value={popularSearch}
                         onChange={e => { setPopularSearch((e.target as HTMLInputElement).value); setPopularPage(1); }}
                         placeholder={t('addedit_search_placeholder') || 'Search popular subscriptions...'}
                         contentBefore={<Search24Regular />}
-                        style={{ width: '100%', margin: '0 16px' }}
+                        className={styles.fullWidth}
                       />
                     </div>
                     {loadingPopular ? (
                       <div className={styles.addeditCardPopular}>
                         {Array.from({ length: 4 }).map((_, idx) => (
-                          <div key={idx} className={styles.skeleton} style={{ height: 140, borderRadius: 16 }} />
+                          <div key={idx} className={styles.skeletonCard} />
                         ))}
                       </div>
                     ) : popularError ? (
@@ -290,20 +281,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                         </div>
                         {/* Pagination */}
                         {totalPopularPages > 1 && (
-                          <div
-                            style={{
-                              display: 'flex',
-                              flexWrap: 'wrap',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              margin: '32px 0 20px 0',
-                              paddingBottom: 20,
-                              gap: 4,
-                              width: '100%',
-                              maxWidth: '100vw',
-                              boxSizing: 'border-box',
-                            }}
-                          >
+                          <div className={styles.paginationRow}>
                             <Button
                               appearance="subtle"
                               disabled={popularPage === 1}
@@ -342,7 +320,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                   </>
                 ) : (
                   <>
-                    <div style={{ fontSize: 28, fontWeight: 600, marginBottom: 24, color: 'var(--fluent-colorNeutralForeground1)' }}>
+                    <div className={styles.tabTitle}>
                       {isEdit ? t('addedit_edit_title') || 'Edit Subscription' : t('addedit_add_title') || 'Add Subscription'}
                     </div>
                     <form className={styles["addedit-form"]} onSubmit={handleSubmit}>
@@ -397,6 +375,7 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                           <Option value={t('addedit_category_streaming') || 'Streaming'}>{t('addedit_category_streaming') || 'Streaming'}</Option>
                           <Option value={t('addedit_category_software') || 'Software'}>{t('addedit_category_software') || 'Software'}</Option>
                           <Option value={t('addedit_category_insurance') || 'Insurance'}>{t('addedit_category_insurance') || 'Insurance'}</Option>
+                          <Option value={t('addedit_category_gaming') || 'Gaming'}>{t('addedit_category_gaming') || 'Gaming'}</Option>
                           <Option value={t('addedit_category_other') || 'Other'}>{t('addedit_category_other') || 'Other'}</Option>
                         </Dropdown>
                       </div>
@@ -428,6 +407,23 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                               ))}
                             </Combobox>
                           </div>
+                          {/* Auto Renew Toggle */}
+                          <div className={styles.autoRenewRow}>
+                            <Switch
+                              className={styles.autoRenewSwitch}
+                              id="sub-auto-renew"
+                              labelPosition="above"
+                              checked={autoRenew}
+                              onChange={(_e, data) => setAutoRenew(!!data.checked)}
+                              label={t('addedit_auto_renew') || 'Auto Renew'}
+                              title="Enable or disable auto renew for this subscription"
+                            />
+                            <span
+                              className={styles.autoRenewStatus}
+                            >
+                              {t(autoRenew ? 'addedit_auto_renew_yes' : 'addedit_auto_renew_no')}
+                            </span>
+                          </div>
                           <div className={styles.colorCol}>
                             <Label htmlFor="sub-color" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                               <span>{t('addedit_color') || 'Color'}</span>
@@ -439,7 +435,8 @@ function AddEditSubscriptionPageContent({ token, user }: AddEditSubscriptionPage
                                 id="sub-color"
                                 value={color}
                                 onChange={e => setColor(e.target.value)}
-                                style={{ width: 48, height: 32, border: 'none', background: 'none', padding: 0, cursor: 'pointer', marginTop: 2 }}
+                                className={styles.colorInput}
+                                title={t('addedit_color') || 'Color'}
                               />
                             </div>
                           </div>
