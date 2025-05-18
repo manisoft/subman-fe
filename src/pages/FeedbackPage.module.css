@@ -1,0 +1,89 @@
+.feedbackBg {
+    background: var(--fluent-colorNeutralBackground1);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.feedbackContainer {
+    margin: 0 auto;
+    width: 700px;
+    padding: 48px 24px 24px 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 600px) {
+    .feedbackBg {
+        background: var(--fluent-colorNeutralBackground1);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+    }
+
+    .feedbackContainer {
+        padding: 24px 0px 12px 0px;
+        width: 100%;
+    }
+
+    .feedbackCard {
+        padding: 0.2rem 0rem 0rem 0.2rem;
+        margin-left: .5rem;
+        margin-right: .5rem;
+        margin-bottom: 18px;
+    }
+}
+
+.feedbackCard {
+    padding: 2rem 2rem 2.5rem 2rem;
+    border-radius: 0.5rem;
+    background: var(--fluent-colorNeutralBackground1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1.5px 6px rgba(0, 0, 0, 0.04);
+    margin-bottom: 32px;
+    transition: box-shadow 0.2s, transform 0.3s;
+}
+
+.feedbackFormGroup {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.feedbackStatus {
+    display: block;
+    margin-bottom: 8px;
+}
+
+.feedbackSuccess {
+    color: green;
+}
+
+.feedbackError {
+    color: red;
+}
+
+.feedbackTitle {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+    color: var(--fluent-colorBrandForeground1);
+}
+
+.captchaInput {
+    width: 100px;
+    max-width: 120px;
+}
+
+.feedbackButtonRow {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+/* Footer positioning like Dashboard */
+.footer {
+    margin-top: auto;
+    width: 100%;
+}

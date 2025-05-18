@@ -24,6 +24,7 @@ import { apiRequest } from './api';
 import LandingPage from './pages/LandingPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import FeedbackPage from './pages/FeedbackPage';
 
 // Add a type for the language data
 interface LanguageStrings {
@@ -246,6 +247,7 @@ function App({ colorMode, setColorMode }: AppProps) {
           <Route path="/subscriptions" element={token ? <ViewAllSubscriptionsPage token={token} user={user} /> : <Navigate to="/auth" />} />
           <Route path="/profile" element={token ? <UserProfilePage user={user} token={token} onLogout={handleLogout} /> : <Navigate to="/auth" />} />
           <Route path="/settings" element={token ? <SettingsPage user={user} colorMode={colorMode} setColorMode={setColorMode} pushEnabled={pushEnabled} pushLoading={pushLoading} onPushToggle={handlePushToggle} /> : <Navigate to="/auth" />} />
+          <Route path="/feedback" element={token ? <FeedbackPage user={user} /> : <Navigate to="/auth" />} />
           {/* Admin routes - only for admin users */}
           {token && user?.role === 'admin' && (
             <>
