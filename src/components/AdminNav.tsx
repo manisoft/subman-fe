@@ -6,6 +6,7 @@ const navLinks = [
     { name: 'Settings', key: '/admin/settings' },
     { name: 'Pages', key: '/admin/pages' },
     { name: 'Notifications', key: '/admin/notifications' },
+    { name: 'Feedback Hub', key: '/admin/feedback' },
     { name: 'Analytics', key: '/admin/analytics' },
     { name: 'Popular Services', key: '/admin/popular-services' },
 ];

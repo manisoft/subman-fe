@@ -3,7 +3,6 @@ import { AdminNav } from '../components/AdminNav';
 import { Table, TableHeader, TableRow, TableHeaderCell, TableBody, TableCell, Button, Spinner, Text, FluentProvider, webLightTheme, webDarkTheme, tokens } from '@fluentui/react-components';
 import { apiRequest } from '../api';
 import styles from './AdminDashboardPage.module.css';
-import { useNavigate } from 'react-router-dom';
 
 export default function AdminDashboardPage({ token, user, onLogout }: { token: string; user: any; onLogout: () => void }) {
     // Theme state from localStorage or system
@@ -47,15 +46,16 @@ export default function AdminDashboardPage({ token, user, onLogout }: { token: s
             .finally(() => setLoading(false));
     }, [page, token]);
 
-    const navigate = useNavigate();
 
     return (
         <FluentProvider theme={colorMode === 'dark' ? webDarkTheme : webLightTheme} style={{ minHeight: '100dvh', background: tokens.colorNeutralBackground1 }}>
             <div className={styles.adminDashboardRoot}>
-                <AdminNav selected="/admin/dashboard" onLogout={onLogout} />
+                <AdminNav
+                    selected={"/admin/dashboard"}
+                    onLogout={onLogout}
+                />
                 <main className={styles.adminDashboardMain}>
                     <h1>Admin Dashboard</h1>
-                    {/* Notifications button removed, now in nav */}
                     {loading ? <Spinner size="large" /> : error ? <Text style={{ color: 'red' }}>{error}</Text> : (
                         <>
                             <Table aria-label="User table">
