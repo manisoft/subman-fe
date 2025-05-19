@@ -333,9 +333,9 @@
     "feedback_hub_placeholder_captcha": "Answer",
     "feedback_hub_submit": "Submit",
     "feedback_hub_reset": "Reset",
-    "feedback_hub_success": "Thank you for your feedback!",
-    "feedback_hub_error_captcha": "Captcha incorrect. Please try again.",
-    "feedback_hub_error_failed": "Failed to send feedback. Please try again later."
+    "feedback_hub_success": "Merci pour vos commentaires !",
+    "feedback_hub_error_captcha": "Captcha incorrect. Veuillez réessayer.",
+    "feedback_hub_error_failed": "Échec de l'envoi des commentaires. Veuillez réessayer plus tard."
   },
   "es-ES": {
     "welcome": "Bienvenido",
@@ -502,9 +502,9 @@
     "feedback_hub_placeholder_captcha": "Answer",
     "feedback_hub_submit": "Submit",
     "feedback_hub_reset": "Reset",
-    "feedback_hub_success": "Thank you for your feedback!",
-    "feedback_hub_error_captcha": "Captcha incorrect. Please try again.",
-    "feedback_hub_error_failed": "Failed to send feedback. Please try again later."
+    "feedback_hub_success": "¡Gracias por tus comentarios!",
+    "feedback_hub_error_captcha": "Captcha incorrecto. Por favor, inténtalo de nuevo.",
+    "feedback_hub_error_failed": "No se pudo enviar el comentario. Por favor, inténtalo más tarde."
   },
   "zh-CN": {
     "welcome": "欢迎",
@@ -671,9 +671,9 @@
     "feedback_hub_placeholder_captcha": "Answer",
     "feedback_hub_submit": "Submit",
     "feedback_hub_reset": "Reset",
-    "feedback_hub_success": "Thank you for your feedback!",
-    "feedback_hub_error_captcha": "Captcha incorrect. Please try again.",
-    "feedback_hub_error_failed": "Failed to send feedback. Please try again later."
+    "feedback_hub_success": "感谢您的反馈！",
+    "feedback_hub_error_captcha": "验证码错误，请重试。",
+    "feedback_hub_error_failed": "反馈发送失败，请稍后再试。"
   },
   "ar": {
     "welcome": "مرحبا",

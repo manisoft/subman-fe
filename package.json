@@ -1,6 +1,7 @@
 {
   "name": "fe",
   "version": "0.1.0",
+  "proxy": "http://localhost:4000",
   "private": true,
   "dependencies": {
     "@ctrl/tinycolor": "3.6.1",

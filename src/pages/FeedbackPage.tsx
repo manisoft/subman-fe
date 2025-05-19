@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import styles from './FeedbackPage.module.css';
 import { LanguageContext } from '../App';
+import { apiRequest } from '../api';
 
 function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -31,18 +32,10 @@ export default function FeedbackPage({ user }: { user?: any }) {
         }
         setLoading(true);
         try {
-            const res = await fetch('/api/send-feedback', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, message })
-            });
-            if (res.ok) {
-                setStatus('Thank you for your feedback!');
-                setTitle('');
-                setMessage('');
-            } else {
-                setStatus('Failed to send feedback. Please try again later.');
-            }
+            await apiRequest('/send-feedback', 'POST', { title, message });
+            setStatus('Thank you for your feedback!');
+            setTitle('');
+            setMessage('');
         } catch {
             setStatus('Failed to send feedback. Please try again later.');
         } finally {
@@ -84,7 +77,13 @@ export default function FeedbackPage({ user }: { user?: any }) {
                         {status && (
                             <Text className={styles.feedbackStatus + ' ' + (status.startsWith('Thank') || status.startsWith(t('feedback_hub_success')) ? styles.feedbackSuccess : styles.feedbackError)}>
                                 {
-                                    status.startsWith('Thank') ? t('feedback_hub_success') : status.startsWith('Captcha') ? t('feedback_hub_error_captcha') : status.startsWith('Failed') ? t('feedback_hub_error_failed') : status
+                                    status.startsWith('Thank') || status === t('feedback_hub_success')
+                                        ? t('feedback_hub_success')
+                                        : status.startsWith('Captcha') || status === t('feedback_hub_error_captcha')
+                                            ? t('feedback_hub_error_captcha')
+                                            : status.startsWith('Failed') || status === t('feedback_hub_error_failed')
+                                                ? t('feedback_hub_error_failed')
+                                                : status
                                 }
                             </Text>
                         )}
