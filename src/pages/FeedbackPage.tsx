@@ -32,7 +32,12 @@ export default function FeedbackPage({ user }: { user?: any }) {
         }
         setLoading(true);
         try {
-            await apiRequest('/send-feedback', 'POST', { title, message });
+            await apiRequest('/send-feedback', 'POST', {
+                title,
+                message,
+                userId: user?.id || null,
+                userEmail: user?.email || null
+            });
             setStatus('Thank you for your feedback!');
             setTitle('');
             setMessage('');
