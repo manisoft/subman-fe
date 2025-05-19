@@ -61,7 +61,6 @@ export default function AdminDashboardPage({ token, user, onLogout }: { token: s
                             <Table aria-label="User table">
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHeaderCell>ID</TableHeaderCell>
                                         <TableHeaderCell>Name</TableHeaderCell>
                                         <TableHeaderCell>Email</TableHeaderCell>
                                         <TableHeaderCell>Role</TableHeaderCell>
@@ -72,12 +71,11 @@ export default function AdminDashboardPage({ token, user, onLogout }: { token: s
                                 <TableBody>
                                     {users.map(u => (
                                         <TableRow key={u.id}>
-                                            <TableCell>{u.id}</TableCell>
                                             <TableCell>{u.name}</TableCell>
                                             <TableCell>{u.email}</TableCell>
                                             <TableCell>{u.role}</TableCell>
-                                            <TableCell>{u.created_at}</TableCell>
-                                            <TableCell>{u.updated_at}</TableCell>
+                                            <TableCell>{new Date(u.created_at).toLocaleString()}</TableCell>
+                                            <TableCell>{new Date(u.updated_at).toLocaleString()}</TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
