@@ -46,6 +46,14 @@
   cursor: pointer;
 }
 
+.logoBrandPointer {
+  cursor: pointer;
+}
+
+.logoBrandDefault {
+  cursor: default;
+}
+
 .logoImage {
   width: 40px;
   height: 40px;
@@ -119,4 +127,8 @@
   padding: 0;
   min-width: 0;
   min-height: 0;
+}
+
+.menuListHidden {
+  display: none;
 }

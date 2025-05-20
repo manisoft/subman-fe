@@ -315,6 +315,9 @@ body.dark {
   width: 52px;
   height: 52px;
   margin-bottom: 0.8rem;
+  border-radius: 0;
+  background: unset;
+  box-shadow: unset;
 }
 
 .auth-subtitle {

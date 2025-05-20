@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { parseISO, isAfter, isBefore, addDays, format, isValid, compareAsc, startOfDay, parse, isEqual } from 'date-fns';
 import { motion } from 'framer-motion';
 import { tokens } from '@fluentui/react-components';
 import {
@@ -12,11 +11,11 @@ import Footer from '../components/Footer';
 import styles from './DashboardPage.module.css';
 import { CalendarLtr24Regular, Wallet24Regular, Cart24Regular, MoneyHand24Regular, ErrorCircleRegular } from '@fluentui/react-icons';
 import { getSubscriptions, apiRequest } from '../api';
-import { subscribeUserToPush, unsubscribeUserFromPush } from '../pushNotifications';
 import { useNavigate } from 'react-router-dom';
-import { addMonths, addYears, addWeeks } from 'date-fns';
+import { parse, isValid, isBefore, addMonths, addYears, addWeeks, startOfDay, format, isEqual, compareAsc, addDays, isAfter } from 'date-fns';
 import { LanguageContext } from '../App';
 import { convertPrice, formatPrice } from '../utils/currency';
+import PaymentCalendar from '../components/PaymentCalendar';
 
 // Define Subscription interface
 interface Subscription {
@@ -30,29 +29,6 @@ interface Subscription {
   color?: string | null;
   notes?: string | null;
 }
-
-// Helper function to determine text color based on background luminance
-const getTextColorForBackground = (bgColor: string): string => {
-  // Use tokens for default colors
-  const defaultBg = tokens.colorNeutralBackground3; // Example default token
-  const effectiveBgColor = bgColor || defaultBg;
-
-  try {
-    // Basic luminance check for hex colors (assumes #RRGGBB format)
-    const color = effectiveBgColor.startsWith('#') ? effectiveBgColor.substring(1) : '808080'; // Default to gray if not hex
-    const rgb = parseInt(color, 16);
-    const r = (rgb >> 16) & 0xff;
-    const g = (rgb >> 8) & 0xff;
-    const b = (rgb >> 0) & 0xff;
-    const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-
-    // Use static white for dark backgrounds, primary foreground (theme-aware) for light backgrounds
-    return luma < 128 ? tokens.colorNeutralForeground1Static : tokens.colorNeutralForeground1;
-  } catch (e) {
-    // Fallback if color parsing fails (e.g., not a valid hex)
-    return tokens.colorNeutralForeground1; // Default to standard text color
-  }
-};
 
 // Helper: Parse 'YYYY-MM-DD' as local date (not UTC)
 const parseLocalDate = (dateString: string) => {
@@ -114,11 +90,10 @@ interface DashboardPageProps {
 export default function DashboardPage({ token, user }: DashboardPageProps) {
   const [subs, setSubs] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [page, setPage] = useState(0);
-
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth());
+  const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear());
+
   const navigate = useNavigate();
   const { t } = useContext(LanguageContext);
 
@@ -134,24 +109,40 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
     setLoading(true);
     getSubscriptions(token)
       .then(setSubs)
-      .catch(e => setError(e.message))
+      .catch(e => console.error(e.message))
       .finally(() => setLoading(false));
   }, [token]);
 
   const handleAdd = () => navigate('/subscription');
-  const handleEdit = (id: string) => navigate(`/subscription/${id}`);
   const handleDelete = async (id: string) => {
     setConfirmDelete(null);
-    setSuccess('');
-    setError('');
     try {
       await apiRequest(`/subscriptions/${id}`, 'DELETE', undefined, token);
       setSubs(subs => subs.filter((s: Subscription) => s.id !== id));
-      setSuccess('Subscription deleted successfully.');
     } catch (e: any) {
-      setError(e.message || 'Delete failed');
+      console.error(e.message || 'Delete failed');
     }
   };
+
+  const calendarSubs = subs.map(s => ({
+    id: s.id,
+    name: s.name,
+    logoUrl: s.logo || '',
+    nextPaymentDate: getCurrentNextBillingDate(s.next_billing_date, s.billing_cycle)?.toISOString().slice(0, 10) || '',
+    amount: Number(s.price) || 0,
+    billing_cycle: s.billing_cycle // <-- add this property
+  }));
+  const totalMonthly = subs.reduce((sum: number, s: Subscription) => {
+    const price = convertPrice(Number(s.price), (s as any).currency || 'USD', userCurrency, rates);
+    switch ((s.billing_cycle || '').toLowerCase().replace(/[-\s]/g, '')) {
+      case 'monthly': return sum + price;
+      case 'yearly': return sum + price / 12;
+      case 'weekly': return sum + price * 52 / 12;
+      case 'biweekly': return sum + price * 26 / 12;
+      case 'quarterly': return sum + price * 4 / 12;
+      default: return sum;
+    }
+  }, 0);
 
   return (
     <div className={styles.pageRoot}>
@@ -171,7 +162,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
           exit={{ opacity: 0, y: 100 }}
           transition={{ delay: 0.05, duration: 0.6, ease: [0.1, 0.9, 0.2, 1] }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+          <div className={`${styles.flex} ${styles.alignCenter} ${styles.justifyBetween} ${styles.flexWrap} ${styles.gap16}`}>
             <div>
               <Text size={800} weight="bold" as="h1">
                 {(t('dashboard_welcome') || 'Welcome back, {name}!').replace('{name}', user?.name || user?.email || 'User')}
@@ -194,7 +185,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
         >
           {loading
             ? Array.from({ length: 4 }).map((_, idx) => (
-              <div key={idx} className={styles.skeleton} style={{ height: 120, borderRadius: 16 }} />
+              <div key={idx} className={`${styles.skeleton} ${styles.skeletonWide}`} />
             ))
             : ([
               {
@@ -270,19 +261,39 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                 style={{ borderRadius: '0.5rem', overflow: 'visible' }}
               >
                 <Card className={`${styles.fluentCard} shadow-sm fluent-card fluent-reveal-effect`}>
-                  <div className={styles.cardHeader} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <h3 style={{ margin: 0, fontWeight: 500, fontSize: '0.95rem', letterSpacing: 0, lineHeight: 1.3, color: 'var(--fluent-colorNeutralForeground1)' }}>{card.label}</h3>
-                    <span style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fluent-colorNeutralForeground3, #888)' }}>
+                  <div className={styles.cardHeader}>
+                    <h3 className={styles.cardLabel}>{card.label}</h3>
+                    <span className={styles.cardIcon}>
                       {React.cloneElement(card.icon as React.ReactElement, { style: { fontSize: 20, color: 'inherit', background: 'none', padding: 0, margin: 0 } })}
                     </span>
                   </div>
                   <div className={styles.cardContent}>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--fluent-colorNeutralForeground1)' }}>{card.value}</div>
-                    <p style={{ fontSize: '0.85rem', margin: '0.25rem 0 0 0', color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{card.sub}</p>
+                    <div className={styles.cardValue}>{card.value}</div>
+                    <p className={styles.cardSub}>{card.sub}</p>
                   </div>
                 </Card>
               </motion.div>
             ))}
+        </motion.div>
+
+        {/* Payment Calendar Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 100 }}
+          transition={{ delay: 0.15, duration: 0.6, ease: [0.1, 0.9, 0.2, 1] }}
+          className={styles.paymentCalendarSection}
+        >
+          <PaymentCalendar
+            subscriptions={calendarSubs}
+            month={calendarMonth}
+            year={calendarYear}
+            totalMonthly={Math.round(totalMonthly)}
+            onChangeMonth={(newMonth, newYear) => {
+              setCalendarMonth(newMonth);
+              setCalendarYear(newYear);
+            }}
+          />
         </motion.div>
 
         {/* 2-column grid: Upcoming Payments and Spending by Category */}
@@ -302,13 +313,13 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
               style={{ borderRadius: '0.5rem' }}
             >
               <Card className={`${styles.fluentCard} shadow-sm fluent-card fluent-reveal-effect`}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalXS }}>
+                <div className={`${styles.flex} ${styles.flexCol} ${styles.gapXS}`}>
                   <Text size={600} weight="semibold">{t('dashboard_upcoming_payments') || 'Upcoming Payments'}</Text>
                   <Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{t('dashboard_payments_due_30') || 'Your subscription payments due in the next 30 days'}</Text>
                 </div>
-                <div style={{ padding: tokens.spacingVerticalXL, textAlign: 'center' }}>
+                <div className={`${styles.pvXL} ${styles.textCenter}`}>
                   {loading ? (
-                    <div className={styles.skeleton} style={{ height: 96, borderRadius: 12, margin: '0 auto' }} />
+                    <div className={`${styles.skeleton} ${styles.skeletonTall} ${styles.marginAuto}`} />
                   ) : (
                     subs.length === 0 ? (
                       <>
@@ -344,7 +355,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                         );
                       }
                       return upcoming.map(s => (
-                        <div key={s.id} style={{ marginBottom: tokens.spacingVerticalXS }}>
+                        <div key={s.id} className={styles.marginBottomXS}>
                           <Text weight="semibold">{s.name}</Text>
                           <Text size={300} style={{ marginLeft: tokens.spacingHorizontalS }}>{formatFriendlyDate(s._computedNextBillingDate.toISOString().slice(0, 10))}</Text>
                         </div>
@@ -353,7 +364,7 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                   )}
                 </div>
                 {subs.length > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'center', margin: '16px 0 0 0' }}>
+                  <div className={`${styles.flex} ${styles.justifyCenter} ${styles.marginTop16}`}>
                     <Button appearance="secondary" onClick={() => navigate('/subscriptions')}>
                       {t('dashboard_view_all') || 'View all subscriptions'}
                     </Button>
@@ -372,13 +383,13 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
               style={{ borderRadius: '0.5rem' }}
             >
               <Card className={`${styles.fluentCard} shadow-sm fluent-card fluent-reveal-effect`}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalXS }}>
+                <div className={`${styles.flex} ${styles.flexCol} ${styles.gapXS}`}>
                   <Text size={600} weight="semibold">{t('dashboard_spending_by_cat') || 'Spending by Category'}</Text>
                   <Text size={300} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{t('dashboard_spending_dist') || 'How your subscriptions are distributed'}</Text>
                 </div>
-                <div style={{ padding: tokens.spacingVerticalXL, textAlign: 'center' }}>
+                <div className={`${styles.pvXL} ${styles.textCenter}`}>
                   {loading ? (
-                    <div className={styles.skeleton} style={{ height: 96, borderRadius: 12 }} />
+                    <div className={`${styles.skeleton} ${styles.skeletonTall}`} />
                   ) : (
                     (() => {
                       // Get unique categories, ignoring 'Uncategorized' if all are uncategorized
@@ -404,18 +415,18 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
                         'rgb(217, 128, 38)',
                       ];
                       return (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: tokens.spacingVerticalS }}>
+                        <div className={`${styles.flex} ${styles.flexCol} ${styles.gapS}`}>
                           {categories.map((cat, idx) => {
                             const color = colorPalette[idx % colorPalette.length];
                             const total = subs.filter(s => s.category === cat).reduce((sum, s) => sum + convertPrice(Number(s.price), (s as any).currency || 'USD', userCurrency, rates), 0);
                             const count = subs.filter(s => s.category === cat).length;
                             return (
-                              <div key={cat} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                  <span className={styles.categoryDot} style={{ backgroundColor: color }} />
+                              <div key={cat} className={`${styles.flex} ${styles.alignCenter} ${styles.justifyBetween}`}>
+                                <div className={`${styles.flex} ${styles.alignCenter}`}>
+                                  <span className={styles.categoryDot} style={{ '--category-dot-bg': color } as React.CSSProperties} />
                                   <Text weight="medium">{cat}</Text>
                                 </div>
-                                <div style={{ textAlign: 'right' }}>
+                                <div className={styles.textRight}>
                                   <Text weight="bold">{displayPrice(total, userCurrency)}</Text>
                                   <div>
                                     <Text size={100} style={{ color: 'var(--fluent-colorNeutralForeground3, #888)' }}>{count} {t('dashboard_subs') || 'subscription'}{count !== 1 ? 's' : ''}</Text>
@@ -433,18 +444,18 @@ export default function DashboardPage({ token, user }: DashboardPageProps) {
             </motion.div>
           </div>
         </motion.div>
+
+
       </motion.main>
       {/* Delete Confirmation Modal */}
       {confirmDelete && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: tokens.colorNeutralShadowAmbient, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
-        }}>
-          <div style={{ background: tokens.colorNeutralBackground1, padding: tokens.spacingHorizontalXXL, borderRadius: tokens.borderRadiusXLarge, boxShadow: tokens.shadow16, minWidth: 320 }}>
+        <div className={styles.deleteModalOverlay}>
+          <div className={styles.deleteModalBox}>
             <Text size={500} weight="semibold">{t('dashboard_delete_title') || 'Delete this subscription?'}</Text>
-            <div style={{ margin: `${tokens.spacingVerticalXL} 0` }}>
+            <div className={styles.deleteModalContent}>
               <Text>{t('dashboard_delete_desc') || 'Are you sure you want to delete this subscription? This action cannot be undone.'}</Text>
             </div>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'flex-end' }}>
+            <div className={styles.deleteModalActions}>
               <Button appearance="subtle" onClick={() => setConfirmDelete(null)}>{t('dashboard_cancel') || 'Cancel'}</Button>
               <Button appearance="primary" onClick={() => handleDelete(confirmDelete!)}>{t('dashboard_delete') || 'Delete'}</Button>
             </div>

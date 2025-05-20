@@ -1,0 +1,235 @@
+.calendarProvider {
+    background: transparent !important;
+}
+
+.expensesBox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 16px 16px 0 0;
+    padding: 16px 24px 8px 24px;
+    margin-bottom: 0;
+}
+
+.expensesAmount {
+    font-size: 2.2rem;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.calendarBox {
+    background: transparent;
+    padding: 16px 12px 0px 12px;
+}
+
+.calendarHeader {
+    margin-top: 1.2rem;
+    margin-left: .6rem;
+    margin-right: .6rem;
+    text-align: left;
+    font-size: 1.7rem;
+    font-weight: 600;
+    color: var(--colorNeutralForeground1);
+    margin-bottom: 8px;
+}
+
+.calendarDescription {
+    font-size: 0.9rem;
+    color: var(--fluent-colorNeutralForeground3, #888);
+    margin-top: 1rem;
+    margin-left: 0.6rem;
+    margin-right: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.calendarGrid {
+    height: 380px;
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.dayName {
+    color: #b0b8d1;
+    font-size: 0.95rem;
+    text-align: center;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.dayCell {
+    min-height: 44px;
+    background: transparent;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+    transition: background 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2px 0 0 0;
+}
+
+.activeDay {
+    background: #0f6cbd;
+    box-shadow: 0 2px 8px #0001;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.dayNumber {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.logoRow {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px;
+    margin-top: 2px;
+}
+
+.logo {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 1px 4px #0002;
+    margin: 1px;
+    object-fit: contain;
+    opacity: 0;
+    animation: fadeInLogo 0.5s forwards;
+}
+
+@keyframes fadeInLogo {
+    to {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+}
+
+.dayCellClickable {
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+    box-shadow: 0 0 0 0 transparent;
+}
+
+.dayCellClickable:focus,
+.dayCellClickable:hover {
+    box-shadow: 0 2px 12px 0 rgba(57, 114, 236, 0.13);
+    z-index: 2;
+}
+
+.popoverContent {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 180px;
+    padding: 8px 0;
+}
+
+.popoverSubRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 12px;
+}
+
+.popoverLogo {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 1px 4px #0001;
+}
+
+.popoverName {
+    flex: 1;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.popoverAmount {
+    font-weight: 600;
+    color: var(--fluent-colorBrandForeground1, #3972ec);
+    font-size: 1rem;
+}
+
+.carouselBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.carouselBtn {
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 50%;
+    font-size: 1.2em;
+    background: var(--fluent-colorNeutralBackground2, #f3f3f3);
+    box-shadow: 0 1px 4px #0001;
+}
+
+.carouselMonth {
+    width: 200px;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--fluent-colorBrandForeground1, #3972ec);
+    padding: 0 8px;
+}
+
+.today {
+    position: relative;
+}
+
+.todayDayCell {
+    background: #81BC06 !important;
+    color: #fff !important;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #0002;
+}
+
+.todayDayCell .dayNumber,
+.todayDayCell .logo,
+.todayDayCell .moreCount {
+    color: #fff !important;
+    background: transparent !important;
+}
+
+.moreCount {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: #fff;
+    background: #8888;
+    border-radius: 6px;
+    padding: 0 6px;
+    margin-left: 2px;
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+.backToTodayRow {
+    display: flex;
+    justify-content: center;
+    min-height: 40px;
+    align-items: center;
+}
+
+.backToTodayRow:empty {
+    min-height: 40px;
+}
+
+@media (max-width: 600px) {
+    .calendarGrid {
+        height: unset;
+    }
+}
