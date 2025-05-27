@@ -79,7 +79,7 @@ export default function PopularServiceCard({ service, index }: PopularServiceCar
           />
         </div>
         {/* Subscription Name */}
-        <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 10, color: textColor }}>{service.name}</div>
+        <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 10, color: textColor, height: 50, width: '86%' }}>{service.name}</div>
         {/* Categories */}
         <div style={{ fontSize: 14, color: textColor, opacity: 0.7, marginBottom: 0 }}>{Array.isArray(service.categories) ? service.categories.map((cat: string) => toTitleCase(cat)).join(', ') : toTitleCase(service.categories || '')}</div>
       </Card>
