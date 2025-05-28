@@ -39,7 +39,9 @@ function getDefaultCurrency() {
 
 export default function SettingsPage({ user, colorMode, setColorMode, pushEnabled, pushLoading, onPushToggle }: SettingsPageProps) {
   // Check browser notification permission
-  const [permission, setPermission] = React.useState(Notification.permission);
+  const [permission, setPermission] = React.useState(
+    typeof Notification !== 'undefined' ? Notification.permission : 'default'
+  );
   const prevPermission = React.useRef(permission);
   const { language, setLanguage, t } = useContext(LanguageContext);
 
@@ -90,7 +92,7 @@ export default function SettingsPage({ user, colorMode, setColorMode, pushEnable
 
   React.useEffect(() => {
     try {
-      setPermission(Notification.permission);
+      setPermission(typeof Notification !== 'undefined' ? Notification.permission : 'default');
     } catch {
       setPermission('default');
     }
